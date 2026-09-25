@@ -12,7 +12,7 @@
     "build": "astro build",
     "preview": "astro preview",
     "check": "astro check",
-    "test": "node --experimental-strip-types --test tests/content.test.ts"
+    "test": "node --experimental-strip-types --test tests/*.test.ts"
   },
   "dependencies": {
     "astro": "^7.1.6"

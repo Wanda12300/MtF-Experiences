@@ -1,0 +1,19 @@
+---
+import type { CollectionEntry } from 'astro:content';
+
+interface Props {
+  entry: CollectionEntry<'listings'>;
+}
+
+const { entry } = Astro.props;
+const description = entry.body?.trim() ?? '';
+---
+
+<a class="resource-card" href={`/resources/${entry.id}/`} aria-label={`查看${entry.data.name}详情`}>
+  <div class="resource-card-heading">
+    <h3>{entry.data.name}</h3>
+    <span class="resource-card-arrow" aria-hidden="true">→</span>
+  </div>
+  <p>{description}</p>
+  <span class="resource-card-action">查看详情</span>
+</a>

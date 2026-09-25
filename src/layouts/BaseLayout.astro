@@ -1,0 +1,69 @@
+---
+import '../styles/app.css';
+
+interface Props {
+  title?: string;
+  description?: string;
+}
+
+const { title, description = '跨性别相关资源的历史收录目录。条目说明与外部链接未经独立复核。' } = Astro.props;
+const pageTitle = title ? `${title} | MtF Experiences` : 'MtF Experiences | 跨性别资源目录';
+---
+
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content={description} />
+    <meta name="color-scheme" content="light dark" />
+    <title>{pageTitle}</title>
+    <script is:inline>
+      try {
+        const savedTheme = localStorage.getItem('theme');
+        const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        document.documentElement.dataset.theme = savedTheme ?? (prefersDark ? 'dark' : 'light');
+      } catch {
+        document.documentElement.dataset.theme = 'light';
+      }
+    </script>
+  </head>
+  <body>
+    <a class="skip-link" href="#main-content">跳至主要内容</a>
+    <div class="site-frame">
+      <header class="site-header">
+        <a class="brand" href="/" aria-label="MtF Experiences 首页">
+          <span class="brand-mark" aria-hidden="true">M</span>
+          <span>MtF Experiences</span>
+        </a>
+        <nav class="main-nav" aria-label="主导航">
+          <a href="/" aria-current={Astro.url.pathname === '/' ? 'page' : undefined}>首页</a>
+          <a href="/resources/" aria-current={Astro.url.pathname.startsWith('/resources') ? 'page' : undefined}>资源目录</a>
+          <button class="theme-toggle" type="button" id="theme-toggle" aria-label="切换明暗主题" title="切换明暗主题">
+            <span aria-hidden="true">◐</span>
+          </button>
+        </nav>
+      </header>
+
+      <slot />
+
+      <footer class="site-footer">
+        <p>MtF Experiences · 跨性别资源目录</p>
+        <p>条目沿用上游原始收录，未经独立复核；请在访问外部网站前自行判断。</p>
+      </footer>
+    </div>
+
+    <script is:inline>
+      const themeToggle = document.querySelector('#theme-toggle');
+      themeToggle?.addEventListener('click', () => {
+        const nextTheme = document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark';
+        document.documentElement.dataset.theme = nextTheme;
+        try {
+          localStorage.setItem('theme', nextTheme);
+        } catch {
+          // Keep the selected theme for this page view when storage is unavailable.
+        }
+      });
+    </script>
+  </body>
+</html>
