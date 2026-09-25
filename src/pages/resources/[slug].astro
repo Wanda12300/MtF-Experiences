@@ -21,9 +21,8 @@ export async function getStaticPaths() {
 }
 
 const { entry, categoryName } = Astro.props;
-const description = entry.body?.trim() ?? '';
 ---
 
 <BaseLayout title={entry.data.name}>
-  <ResourceDetail entry={entry} categoryName={categoryName} description={description} />
+  <ResourceDetail entry={entry} categoryName={categoryName} />
 </BaseLayout>

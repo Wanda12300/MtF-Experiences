@@ -69,6 +69,7 @@ const categoryCounts = new Map<string, number>(
 <script is:inline data-resource-search-client>
   const searchRoot = document.querySelector('[data-resource-search]');
   if (searchRoot) {
+    const searchForm = searchRoot.querySelector('form[role="search"]');
     const searchInput = searchRoot.querySelector('input[name="q"]');
     const clearButton = searchRoot.querySelector('[data-clear-search]');
     const emptyState = searchRoot.querySelector('[data-empty-state]');
@@ -102,6 +103,10 @@ const categoryCounts = new Map<string, number>(
         : `显示 ${visibleCount} 项资源。`;
     }
 
+    searchForm.addEventListener('submit', (event) => {
+      event.preventDefault();
+      updateResults();
+    });
     searchInput.addEventListener('input', updateResults);
     for (const button of categoryButtons) {
       button.addEventListener('click', () => {

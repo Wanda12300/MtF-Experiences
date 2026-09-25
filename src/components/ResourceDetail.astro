@@ -4,10 +4,10 @@ import type { CollectionEntry } from 'astro:content';
 interface Props {
   entry: CollectionEntry<'listings'>;
   categoryName: string;
-  description: string;
 }
 
-const { entry, categoryName, description } = Astro.props;
+const { entry, categoryName } = Astro.props;
+const description = entry.body?.trim() ?? '';
 const externalUrl = entry.data.url;
 const externalHost = externalUrl ? new URL(externalUrl).host : undefined;
 ---

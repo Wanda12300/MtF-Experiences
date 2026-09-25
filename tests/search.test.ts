@@ -50,8 +50,8 @@ type SearchElement = {
   value: string;
   textContent: string;
   attributes: Record<string, string>;
-  listeners: Record<string, () => void>;
-  addEventListener: (event: string, callback: () => void) => void;
+  listeners: Record<string, (event?: { preventDefault(): void }) => void>;
+  addEventListener: (event: string, callback: (event?: { preventDefault(): void }) => void) => void;
   setAttribute: (name: string, value: string) => void;
   focus: () => void;
 };
@@ -89,11 +89,13 @@ function startSearch(search = '') {
   const categoryButtons = [...resourcesPage.matchAll(/<button\b(?=[^>]*\bdata-category-filter\b)[^>]*>/g)]
     .map(([tag]) => element({ categoryFilter: getAttribute(tag, 'data-category-filter') }));
   const input = element();
+  const form = element();
   const clearButton = element();
   const emptyState = element();
   const resultStatus = element();
   const root = {
     querySelector(selector: string) {
+      if (selector === 'form[role="search"]') return form;
       if (selector === 'input[name="q"]') return input;
       if (selector === '[data-clear-search]') return clearButton;
       if (selector === '[data-empty-state]') return emptyState;
@@ -113,7 +115,7 @@ function startSearch(search = '') {
     URLSearchParams,
   });
 
-  return { cards, categoryButtons, input, clearButton, emptyState, resultStatus };
+  return { cards, categoryButtons, input, form, clearButton, emptyState, resultStatus };
 }
 
 function visibleCards(cards: SearchElement[]) {
@@ -149,6 +151,20 @@ test('category and search filters combine, and clearing search restores the acti
   clearButton.listeners.click();
   assert.equal(input.value, '');
   assert.equal(visibleCards(cards).length, 2);
+  assert.equal(guides.attributes['aria-pressed'], 'true');
+});
+
+test('submitting a search keeps the selected category instead of reloading it away', () => {
+  const { cards, categoryButtons, input, form } = startSearch();
+  const guides = categoryButtons.find(({ dataset }) => dataset.categoryFilter === 'hrt-guides');
+  assert.ok(guides);
+  guides.listeners.click();
+  input.value = 'wiki';
+  input.listeners.input();
+  let prevented = false;
+  form.listeners.submit({ preventDefault: () => { prevented = true; } });
+  assert.equal(prevented, true);
+  assert.equal(visibleCards(cards).length, 0);
   assert.equal(guides.attributes['aria-pressed'], 'true');
 });
 
