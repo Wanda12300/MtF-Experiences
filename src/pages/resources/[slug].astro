@@ -1,0 +1,29 @@
+---
+import { getCollection, type CollectionEntry } from 'astro:content';
+import ResourceDetail from '../../components/ResourceDetail.astro';
+import { resourceCategories } from '../../content/categories/index';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+
+interface Props {
+  entry: CollectionEntry<'listings'>;
+  categoryName: string;
+}
+
+export async function getStaticPaths() {
+  const listings = await getCollection('listings');
+  const categoryNames = new Map<string, string>(resourceCategories.map(({ slug, name }) => [slug, name]));
+
+  return listings.map((entry) => {
+    const categoryName = categoryNames.get(entry.data.category);
+    if (!categoryName) throw new Error(`Unknown category for resource: ${entry.id}`);
+    return { params: { slug: entry.id }, props: { entry, categoryName } };
+  });
+}
+
+const { entry, categoryName } = Astro.props;
+const description = entry.body?.trim() ?? '';
+---
+
+<BaseLayout title={entry.data.name}>
+  <ResourceDetail entry={entry} categoryName={categoryName} description={description} />
+</BaseLayout>

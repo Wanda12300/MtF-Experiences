@@ -572,6 +572,193 @@ input:focus-visible {
   font-weight: 650;
 }
 
+.resource-detail-page {
+  padding-top: 2rem;
+}
+
+.resource-breadcrumb {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.55rem;
+  margin: 0 0 1rem;
+  color: var(--text-muted);
+  font-size: 0.88rem;
+}
+
+.resource-breadcrumb a {
+  color: var(--primary);
+  font-weight: 600;
+}
+
+.resource-breadcrumb a:hover,
+.resource-detail-back-link:hover {
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+}
+
+.resource-breadcrumb [aria-current='page'] {
+  overflow-wrap: anywhere;
+}
+
+.resource-detail-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(16rem, 20rem);
+  align-items: start;
+  gap: 1.25rem;
+}
+
+.resource-detail-main,
+.resource-detail-info {
+  min-width: 0;
+  padding: clamp(1.25rem, 3vw, 2rem);
+  border: 1px solid var(--line-color);
+  border-radius: var(--radius-large);
+  background: var(--card-bg);
+  box-shadow: var(--card-shadow);
+}
+
+.resource-detail-main > .eyebrow,
+.resource-detail-info > .eyebrow {
+  margin-bottom: 0.35rem;
+}
+
+.resource-detail-main h1 {
+  margin: 0;
+  font-size: clamp(1.8rem, 4vw, 2.55rem);
+  font-weight: 750;
+  letter-spacing: -0.045em;
+  line-height: 1.25;
+  overflow-wrap: anywhere;
+}
+
+.resource-detail-history {
+  margin-top: 1.25rem;
+  background: var(--field-bg);
+}
+
+.resource-detail-description {
+  margin-top: 1.7rem;
+}
+
+.resource-detail-description h2,
+.resource-detail-info h2 {
+  margin: 0 0 0.8rem;
+  font-size: 1.12rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.resource-detail-original {
+  color: var(--text-secondary);
+  font-size: 1rem;
+  line-height: 1.8;
+  overflow-wrap: anywhere;
+}
+
+.resource-detail-original > :first-child {
+  margin-top: 0;
+}
+
+.resource-detail-original > :last-child {
+  margin-bottom: 0;
+}
+
+.resource-detail-sidebar {
+  display: grid;
+  gap: 0.9rem;
+}
+
+.resource-detail-info h2 {
+  margin-bottom: 1rem;
+}
+
+.resource-detail-info dl {
+  display: grid;
+  gap: 0.9rem;
+  margin: 0;
+}
+
+.resource-detail-info dl > div {
+  padding-top: 0.8rem;
+  border-top: 1px solid var(--line-color);
+}
+
+.resource-detail-info dt {
+  color: var(--text-muted);
+  font-size: 0.78rem;
+  font-weight: 650;
+}
+
+.resource-detail-info dd {
+  margin: 0.15rem 0 0;
+  color: var(--text-primary);
+  font-size: 0.92rem;
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+
+.resource-detail-external-link {
+  position: relative;
+  display: flex;
+  min-height: 4.25rem;
+  flex-direction: column;
+  justify-content: center;
+  gap: 0.1rem;
+  margin-top: 1.15rem;
+  padding: 0.7rem 2.4rem 0.7rem 0.85rem;
+  border-radius: 0.85rem;
+  background: var(--primary);
+  color: oklch(0.99 0.003 265);
+  transition: background-color 150ms ease, transform 150ms ease;
+}
+
+.resource-detail-external-link:hover {
+  transform: translateY(-1px);
+  background: var(--primary-hover);
+}
+
+.resource-detail-external-link > span:first-child {
+  font-size: 0.9rem;
+  font-weight: 700;
+}
+
+.resource-detail-external-host {
+  font-size: 0.76rem;
+  opacity: 0.86;
+  overflow-wrap: anywhere;
+}
+
+.resource-detail-external-arrow {
+  position: absolute;
+  top: 50%;
+  right: 0.9rem;
+  font-size: 1.2rem;
+  transform: translateY(-50%);
+}
+
+.resource-detail-no-link {
+  margin: 1.15rem 0 0;
+  padding: 0.8rem;
+  border: 1px dashed var(--line-color);
+  border-radius: 0.85rem;
+  color: var(--text-secondary);
+  font-size: 0.84rem;
+  overflow-wrap: anywhere;
+}
+
+.resource-detail-back-link {
+  display: inline-flex;
+  min-height: 2.75rem;
+  align-items: center;
+  justify-content: center;
+  padding: 0.35rem 0.8rem;
+  border-radius: 0.75rem;
+  color: var(--primary);
+  font-size: 0.9rem;
+  font-weight: 650;
+}
+
 .site-footer {
   margin-top: 3rem;
   padding: 1.5rem 0 2.25rem;
@@ -588,6 +775,15 @@ input:focus-visible {
 @media (max-width: 900px) {
   .resource-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .resource-detail-layout {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .resource-detail-sidebar {
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: start;
   }
 }
 
@@ -635,6 +831,28 @@ input:focus-visible {
 
   .home-page {
     padding-top: 1rem;
+  }
+
+  .resource-detail-page {
+    padding-top: 1rem;
+  }
+
+  .resource-detail-main,
+  .resource-detail-info {
+    padding: 1.1rem;
+    border-radius: 1rem;
+  }
+
+  .resource-detail-sidebar {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .resource-detail-description {
+    margin-top: 1.35rem;
+  }
+
+  .resource-detail-original {
+    font-size: 0.94rem;
   }
 
   .intro-panel {
