@@ -310,6 +310,114 @@ input:focus-visible {
   font-size: 0.82rem;
 }
 
+.resources-page {
+  padding-top: 2rem;
+}
+
+.resources-intro {
+  padding-bottom: 1.7rem;
+}
+
+.resource-directory {
+  margin-top: 1.5rem;
+}
+
+.resource-directory .resource-card[hidden] {
+  display: none;
+}
+
+.resource-directory-controls {
+  padding: 1.1rem;
+  border: 1px solid var(--line-color);
+  border-radius: var(--radius-large);
+  background: var(--card-bg);
+  box-shadow: var(--card-shadow);
+}
+
+.resource-search-clear {
+  min-height: 2.5rem;
+  margin-top: 0.55rem;
+  padding: 0.35rem 0.75rem;
+  border: 1px solid var(--line-color);
+  border-radius: 0.7rem;
+  background: var(--field-bg);
+  color: var(--primary);
+  cursor: pointer;
+  font-size: 0.88rem;
+  font-weight: 600;
+}
+
+.resource-search-clear:hover {
+  border-color: var(--primary);
+}
+
+.resource-category-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 1rem;
+}
+
+.resource-category-button {
+  display: inline-flex;
+  min-height: 2.65rem;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.4rem 0.8rem;
+  border: 1px solid var(--line-color);
+  border-radius: 0.8rem;
+  background: var(--field-bg);
+  color: var(--text-secondary);
+  cursor: pointer;
+  font-size: 0.88rem;
+  font-weight: 600;
+  transition: background-color 150ms ease, border-color 150ms ease, color 150ms ease;
+}
+
+.resource-category-button:hover,
+.resource-category-button[aria-pressed='true'] {
+  border-color: color-mix(in oklch, var(--primary) 38%, var(--line-color));
+  background: var(--soft-accent);
+  color: var(--primary);
+}
+
+.resource-category-button span {
+  color: var(--text-muted);
+  font-size: 0.78rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.resource-search-status {
+  margin: 1rem 0 0.75rem;
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+}
+
+.resource-search-empty {
+  margin: 1rem 0;
+  padding: 1.2rem;
+  border: 1px dashed var(--line-color);
+  border-radius: var(--radius-large);
+  color: var(--text-secondary);
+  text-align: center;
+}
+
+.resource-search-results {
+  margin-top: 0.75rem;
+}
+
+.resource-card-category {
+  align-self: flex-start;
+  margin-bottom: 0.65rem;
+  padding: 0.2rem 0.55rem;
+  border-radius: 999px;
+  background: var(--soft-accent);
+  color: var(--primary);
+  font-size: 0.72rem;
+  font-weight: 650;
+  line-height: 1.5;
+}
+
 .history-note {
   display: flex;
   align-items: flex-start;

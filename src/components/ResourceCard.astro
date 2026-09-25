@@ -3,15 +3,27 @@ import type { CollectionEntry } from 'astro:content';
 
 interface Props {
   entry: CollectionEntry<'listings'>;
+  categoryLabel?: string;
+  searchable?: boolean;
 }
 
-const { entry } = Astro.props;
+const { entry, categoryLabel, searchable = false } = Astro.props;
 const description = entry.body?.trim() ?? '';
 ---
 
-<a class="resource-card" href={`/resources/${entry.id}/`} aria-label={`查看${entry.data.name}详情`}>
+<a
+  class="resource-card"
+  href={`/resources/${entry.id}/`}
+  aria-label={entry.data.strikethrough
+    ? `查看${entry.data.name}详情（上游原有删除线标记）`
+    : `查看${entry.data.name}详情`}
+  data-resource-card={searchable ? '' : undefined}
+  data-category={searchable ? entry.data.category : undefined}
+  data-search-text={searchable ? `${entry.data.name} ${description}` : undefined}
+>
+  {categoryLabel && <span class="resource-card-category">{categoryLabel}</span>}
   <div class="resource-card-heading">
-    <h3>{entry.data.name}</h3>
+    <h3>{entry.data.strikethrough ? <del>{entry.data.name}</del> : entry.data.name}</h3>
     <span class="resource-card-arrow" aria-hidden="true">→</span>
   </div>
   <p>{description}</p>

@@ -1,0 +1,120 @@
+---
+import type { CollectionEntry } from 'astro:content';
+import ResourceCard from './ResourceCard.astro';
+
+interface Props {
+  entries: CollectionEntry<'listings'>[];
+  categories: readonly { slug: string; name: string }[];
+}
+
+const { entries, categories } = Astro.props;
+const categoryNames = new Map(categories.map(({ slug, name }) => [slug, name]));
+const categoryCounts = new Map<string, number>(
+  categories.map(({ slug }) => [slug, entries.filter(({ data }) => data.category === slug).length]),
+);
+---
+
+<section class="resource-directory" data-resource-search aria-label="资源目录筛选">
+  <div class="resource-directory-controls">
+    <form class="home-search resource-search-form" action="/resources/" method="get" role="search">
+      <label class="visually-hidden" for="directory-query">搜索资源名称或说明</label>
+      <input
+        id="directory-query"
+        type="search"
+        name="q"
+        placeholder="搜索资源名称或说明…"
+        autocomplete="off"
+      />
+      <button type="submit">
+        <svg aria-hidden="true" viewBox="0 0 24 24" focusable="false">
+          <circle cx="10.8" cy="10.8" r="6.3" />
+          <path d="m15.5 15.5 4.2 4.2" />
+        </svg>
+        <span>搜索</span>
+      </button>
+    </form>
+    <button class="resource-search-clear" type="button" data-clear-search hidden>清除搜索词</button>
+
+    <div class="resource-category-filters" role="group" aria-label="按分类筛选资源">
+      <button class="resource-category-button" type="button" data-category-filter="all" aria-pressed="true">
+        全部 <span>{entries.length}</span>
+      </button>
+      {categories.map((category) => (
+        <button
+          class="resource-category-button"
+          type="button"
+          data-category-filter={category.slug}
+          aria-pressed="false"
+        >
+          {category.name} <span>{categoryCounts.get(category.slug) ?? 0}</span>
+        </button>
+      ))}
+    </div>
+  </div>
+
+  <p class="resource-search-status" data-result-status role="status" aria-live="polite">
+    显示 {entries.length} 项资源。
+  </p>
+  <p class="resource-search-empty" data-empty-state hidden>
+    没有找到匹配的资源。请调整搜索词或分类，或清除搜索词后重试。
+  </p>
+
+  <div class="resource-grid resource-search-results">
+    {entries.map((entry) => (
+      <ResourceCard entry={entry} categoryLabel={categoryNames.get(entry.data.category) ?? ''} searchable />
+    ))}
+  </div>
+</section>
+
+<script is:inline data-resource-search-client>
+  const searchRoot = document.querySelector('[data-resource-search]');
+  if (searchRoot) {
+    const searchInput = searchRoot.querySelector('input[name="q"]');
+    const clearButton = searchRoot.querySelector('[data-clear-search]');
+    const emptyState = searchRoot.querySelector('[data-empty-state]');
+    const resultStatus = searchRoot.querySelector('[data-result-status]');
+    const categoryButtons = [...searchRoot.querySelectorAll('[data-category-filter]')];
+    const resourceCards = [...searchRoot.querySelectorAll('[data-resource-card]')];
+    const initialQuery = new URLSearchParams(window.location.search).get('q');
+    let activeCategory = 'all';
+
+    searchInput.value = initialQuery ?? '';
+
+    function updateResults() {
+      const query = searchInput.value.trim().toLocaleLowerCase();
+      let visibleCount = 0;
+
+      for (const card of resourceCards) {
+        const matchesCategory = activeCategory === 'all' || card.dataset.category === activeCategory;
+        const matchesQuery = (card.dataset.searchText ?? '').toLocaleLowerCase().includes(query);
+        card.hidden = !(matchesCategory && matchesQuery);
+        if (!card.hidden) visibleCount += 1;
+      }
+
+      for (const button of categoryButtons) {
+        button.setAttribute('aria-pressed', String(button.dataset.categoryFilter === activeCategory));
+      }
+
+      clearButton.hidden = query.length === 0;
+      emptyState.hidden = visibleCount > 0;
+      resultStatus.textContent = query
+        ? `搜索“${searchInput.value.trim()}”：找到 ${visibleCount} 项资源。`
+        : `显示 ${visibleCount} 项资源。`;
+    }
+
+    searchInput.addEventListener('input', updateResults);
+    for (const button of categoryButtons) {
+      button.addEventListener('click', () => {
+        activeCategory = button.dataset.categoryFilter;
+        updateResults();
+      });
+    }
+    clearButton.addEventListener('click', () => {
+      searchInput.value = '';
+      updateResults();
+      searchInput.focus();
+    });
+
+    updateResults();
+  }
+</script>
