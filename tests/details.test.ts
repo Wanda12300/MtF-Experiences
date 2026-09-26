@@ -38,8 +38,7 @@ test('every Markdown listing has a static detail page with its source category a
     assert.ok(page, `${id} should have its own static detail page`);
     assert.match(page, /<main[^>]*class="resource-detail-page"/);
     assert.match(page, /class="resource-detail-layout"/);
-    assert.match(page, /历史快照/);
-    assert.match(page, /未经独立复核/);
+    assert.doesNotMatch(page, /class="[^"]*history-note/);
     assert.match(page, /原始说明/);
     assert.match(page, /所属分类/);
 

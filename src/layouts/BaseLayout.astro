@@ -1,28 +1,37 @@
 ---
 import '../styles/app.css';
+import { licenseConfig, navBarConfig, profileConfig, siteConfig } from '../config';
 
 interface Props {
   title?: string;
   description?: string;
 }
 
-const { title, description = '跨性别相关资源的历史收录目录。条目说明与外部链接未经独立复核。' } = Astro.props;
-const pageTitle = title ? `${title} | MtF Experiences` : 'MtF Experiences | 跨性别资源目录';
+const { title, description = siteConfig.description } = Astro.props;
+const pageTitle = title ? `${title} | ${siteConfig.title}` : `${siteConfig.title} | ${siteConfig.subtitle}`;
+const showBanner = siteConfig.banner.enable && siteConfig.banner.src;
 ---
 
 <!doctype html>
-<html lang="zh-CN">
+<html lang={siteConfig.lang} data-fixed-color={siteConfig.themeColor.fixed ? 'true' : undefined} style={`--theme-hue: ${siteConfig.themeColor.hue}`}>
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="description" content={description} />
     <meta name="color-scheme" content="light dark" />
+    {siteConfig.favicon.map(({ src, sizes, theme }) => (
+      <link rel="icon" href={src} sizes={sizes} media={theme ? `(prefers-color-scheme: ${theme})` : undefined} />
+    ))}
     <title>{pageTitle}</title>
     <script is:inline>
       try {
         const savedTheme = localStorage.getItem('theme');
         const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
         document.documentElement.dataset.theme = savedTheme ?? (prefersDark ? 'dark' : 'light');
+        const savedHue = Number(localStorage.getItem('theme-hue'));
+        if (document.documentElement.dataset.fixedColor !== 'true' && Number.isInteger(savedHue) && savedHue >= 0 && savedHue <= 360) {
+          document.documentElement.style.setProperty('--theme-hue', String(savedHue));
+        }
       } catch {
         document.documentElement.dataset.theme = 'light';
       }
@@ -32,28 +41,58 @@ const pageTitle = title ? `${title} | MtF Experiences` : 'MtF Experiences | 跨�
     <a class="skip-link" href="#main-content">跳至主要内容</a>
     <div class="site-frame">
       <header class="site-header">
-        <a class="brand" href="/" aria-label="MtF Experiences 首页">
-          <span class="brand-mark" aria-hidden="true">M</span>
-          <span>MtF Experiences</span>
+        <a class="brand" href="/" aria-label={`${siteConfig.title} 首页`}>
+          <span class="brand-mark" aria-hidden="true">{siteConfig.title.charAt(0)}</span>
+          <span>{siteConfig.title}</span>
         </a>
         <nav class="main-nav" aria-label="主导航">
-          <a href="/" aria-current={Astro.url.pathname === '/' ? 'page' : undefined}>首页</a>
-          <a href="/resources/" aria-current={Astro.url.pathname.startsWith('/resources') ? 'page' : undefined}>资源目录</a>
+          {navBarConfig.links.map(({ name, url, external }) => (
+            <a href={url} target={external ? '_blank' : undefined} rel={external ? 'noopener noreferrer' : undefined}
+              aria-current={!external && (url === '/' ? Astro.url.pathname === '/' : Astro.url.pathname.startsWith(url)) ? 'page' : undefined}>{name}</a>
+          ))}
+          {!siteConfig.themeColor.fixed && (
+            <label class="hue-control" title="调整主题色">
+              <span class="visually-hidden">主题色</span>
+              <input id="theme-hue" type="range" min="0" max="360" value={siteConfig.themeColor.hue} aria-label="主题色" />
+            </label>
+          )}
           <button class="theme-toggle" type="button" id="theme-toggle" aria-label="切换明暗主题" title="切换明暗主题">
             <span aria-hidden="true">◐</span>
           </button>
         </nav>
       </header>
 
+      {showBanner && (
+        <figure class="site-banner">
+          <img src={siteConfig.banner.src} alt="" style={`object-position: ${siteConfig.banner.position}`} />
+          {siteConfig.banner.credit.enable && siteConfig.banner.credit.text && (
+            <figcaption>{siteConfig.banner.credit.url
+              ? <a href={siteConfig.banner.credit.url}>{siteConfig.banner.credit.text}</a>
+              : siteConfig.banner.credit.text}</figcaption>
+          )}
+        </figure>
+      )}
       <slot />
 
       <footer class="site-footer">
-        <p>MtF Experiences · 跨性别资源目录</p>
-        <p>条目沿用上游原始收录，未经独立复核；请在访问外部网站前自行判断。</p>
+        <p>{siteConfig.title} · {siteConfig.subtitle}</p>
+        {siteConfig.showHistoricalNotice && <p>条目沿用上游原始收录，未经独立复核；请在访问外部网站前自行判断。</p>}
+        {licenseConfig.enable && licenseConfig.name && (
+          <p>{licenseConfig.url ? <a href={licenseConfig.url}>{licenseConfig.name}</a> : licenseConfig.name}</p>
+        )}
+        <p><a href="/about/">关于 {profileConfig.name}</a></p>
       </footer>
     </div>
 
     <script is:inline>
+      const hueInput = document.querySelector('#theme-hue');
+      if (hueInput) {
+        hueInput.value = getComputedStyle(document.documentElement).getPropertyValue('--theme-hue').trim();
+        hueInput.addEventListener('input', () => {
+          document.documentElement.style.setProperty('--theme-hue', hueInput.value);
+          try { localStorage.setItem('theme-hue', hueInput.value); } catch { /* Keep the color for this view. */ }
+        });
+      }
       const themeToggle = document.querySelector('#theme-toggle');
       themeToggle?.addEventListener('click', () => {
         const nextTheme = document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark';

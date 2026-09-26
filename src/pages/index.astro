@@ -2,11 +2,10 @@
 import { getCollection } from 'astro:content';
 import ResourceCard from '../components/ResourceCard.astro';
 import BaseLayout from '../layouts/BaseLayout.astro';
-
-const featuredIds = ['mtf-wiki', 'thai-pharmacy', 'trans-survival-guide'];
+import { siteConfig } from '../config';
 const listings = await getCollection('listings');
 const listingsById = new Map(listings.map((listing) => [listing.id, listing]));
-const featuredListings = featuredIds.map((id) => {
+const featuredListings = siteConfig.featuredIds.map((id) => {
   const listing = listingsById.get(id);
   if (!listing) throw new Error(`Featured resource not found: ${id}`);
   return listing;
@@ -16,8 +15,8 @@ const featuredListings = featuredIds.map((id) => {
 <BaseLayout title="首页">
   <main id="main-content" class="home-page">
     <section class="intro-panel" aria-labelledby="home-title">
-      <p class="eyebrow">MtF Experiences</p>
-      <h1 id="home-title">跨性别资源目录</h1>
+      <p class="eyebrow">{siteConfig.title}</p>
+      <h1 id="home-title">{siteConfig.subtitle}</h1>
       <p class="intro-copy">整理上游收录的跨性别相关资源与原有说明，帮助你进一步了解并自行判断。</p>
 
       <form class="home-search" action="/resources/" method="get" role="search">
@@ -40,13 +39,15 @@ const featuredListings = featuredIds.map((id) => {
       <p class="search-hint">输入名称或说明中的关键词，前往资源目录查看匹配结果。</p>
     </section>
 
-    <aside class="history-note" aria-label="关于收录内容">
-      <span class="note-mark" aria-hidden="true">i</span>
-      <div>
-        <h2>历史快照</h2>
-        <p>以下条目沿用上游页面原有收录与说明，未经独立复核。外链、内容和商品信息可能已经变化，请不要将其视为当前状态或医疗建议。</p>
-      </div>
-    </aside>
+    {siteConfig.showHistoricalNotice && (
+      <aside class="history-note" aria-label="关于收录内容">
+        <span class="note-mark" aria-hidden="true">i</span>
+        <div>
+          <h2>历史快照</h2>
+          <p>以下条目沿用上游页面原有收录与说明，未经独立复核。外链、内容和商品信息可能已经变化，请不要将其视为当前状态或医疗建议。</p>
+        </div>
+      </aside>
+    )}
 
     <section class="featured-section" aria-labelledby="featured-title">
       <div class="section-heading">

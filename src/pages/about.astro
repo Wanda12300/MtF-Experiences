@@ -1,0 +1,27 @@
+---
+import { aboutConfig, profileConfig, siteConfig } from '../config';
+import BaseLayout from '../layouts/BaseLayout.astro';
+---
+
+<BaseLayout title="关于" description={aboutConfig.paragraphs[0]}>
+  <main id="main-content" class="about-page">
+    <section class="about-intro" aria-labelledby="about-title">
+      {profileConfig.avatar && <img class="about-avatar" src={profileConfig.avatar} alt="" />}
+      <p class="eyebrow">{siteConfig.title}</p>
+      <h1 id="about-title">{aboutConfig.heading}</h1>
+      {profileConfig.bio && <p class="about-bio">{profileConfig.bio}</p>}
+    </section>
+    <section class="about-content" aria-label="项目介绍">
+      {aboutConfig.paragraphs.map((paragraph) => <p>{paragraph}</p>)}
+      {profileConfig.links.length > 0 && (
+        <nav class="about-links" aria-label="项目链接">
+          {profileConfig.links.map(({ name, url, icon }) => (
+            <a href={url} target="_blank" rel="noopener noreferrer">
+              {icon && <img src={icon} alt="" />}{name}<span aria-hidden="true">↗</span>
+            </a>
+          ))}
+        </nav>
+      )}
+    </section>
+  </main>
+</BaseLayout>

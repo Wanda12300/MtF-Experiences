@@ -1,5 +1,6 @@
 ---
 import type { CollectionEntry } from 'astro:content';
+import { siteConfig } from '../config';
 
 interface Props {
   entry: CollectionEntry<'listings'>;
@@ -24,13 +25,15 @@ const externalHost = externalUrl ? new URL(externalUrl).host : undefined;
       <p class="eyebrow">资源详情</p>
       <h1>{entry.data.strikethrough ? <del>{entry.data.name}</del> : entry.data.name}</h1>
 
-      <aside class="history-note resource-detail-history" aria-label="历史快照提示">
-        <span class="note-mark" aria-hidden="true">i</span>
-        <div>
-          <h2>历史快照 · 未经独立复核</h2>
-          <p>以下说明沿用上游页面原文，未经独立复核。外链、内容和商品信息可能已经变化，请勿视为当前状态或医疗建议。</p>
-        </div>
-      </aside>
+      {siteConfig.showHistoricalNotice && (
+        <aside class="history-note resource-detail-history" aria-label="历史快照提示">
+          <span class="note-mark" aria-hidden="true">i</span>
+          <div>
+            <h2>历史快照 · 未经独立复核</h2>
+            <p>以下说明沿用上游页面原文，未经独立复核。外链、内容和商品信息可能已经变化，请勿视为当前状态或医疗建议。</p>
+          </div>
+        </aside>
+      )}
 
       <section class="resource-detail-description" aria-labelledby="resource-description-title">
         <h2 id="resource-description-title">原始说明</h2>
