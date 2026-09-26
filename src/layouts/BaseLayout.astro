@@ -8,7 +8,9 @@ interface Props {
 }
 
 const { title, description = siteConfig.description } = Astro.props;
-const pageTitle = title ? `${title} | ${siteConfig.title}` : `${siteConfig.title} | ${siteConfig.subtitle}`;
+const pageTitle = title
+  ? (title.includes(siteConfig.title) ? title : `${title} | ${siteConfig.title}`)
+  : `${siteConfig.title} | ${siteConfig.subtitle}`;
 const showBanner = siteConfig.banner.enable && siteConfig.banner.src;
 ---
 

@@ -810,8 +810,13 @@ input:focus-visible {
 .about-intro h1 { margin: 0; font-size: clamp(1.65rem, 3vw, 2.4rem); }
 .about-bio { color: var(--text-secondary); }
 .about-avatar { width: 5rem; height: 5rem; border-radius: 50%; object-fit: cover; margin-bottom: 1rem; }
-.about-content p:first-child { margin-top: 0; }
-.about-content p { overflow-wrap: anywhere; }
+.about-markdown > :first-child { margin-top: 0; }
+.about-markdown > :last-child { margin-bottom: 0; }
+.about-markdown { overflow-wrap: anywhere; }
+.about-markdown a { color: var(--primary); text-decoration: underline; text-underline-offset: 0.2em; }
+.about-markdown :is(h2, h3) { line-height: 1.35; }
+.about-markdown img { max-width: 100%; height: auto; }
+.about-markdown pre { max-width: 100%; overflow-x: auto; padding: 1rem; border-radius: 0.75rem; background: var(--field-bg); }
 .about-links { display: flex; flex-wrap: wrap; gap: 0.6rem; margin-top: 1.5rem; }
 .about-links a {
   display: inline-flex;

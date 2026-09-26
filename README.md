@@ -14,7 +14,10 @@ Categories and their display order are maintained in
 ## Customize
 
 Edit `src/config.ts` to set the site title, subtitle, language, metadata description,
-navigation, featured listing IDs, About-page text and links, and visual options:
+navigation, featured listing IDs, profile links, and visual options. Edit
+`src/content/pages/about.md` for the About page heading (`title`), page metadata
+(`description`), and Markdown body; profile name, bio, avatar, and links remain
+in `src/config.ts`:
 
 - `siteConfig.themeColor.hue` sets the initial accent color (0–360). Set `fixed: true`
   to hide the visitor color slider and ignore previously saved color choices. The
@@ -28,8 +31,8 @@ navigation, featured listing IDs, About-page text and links, and visual options:
   license; enabling it does not license upstream resource descriptions.
 - `siteConfig.showHistoricalNotice` defaults to `false` to omit the prominent
   snapshot notices on all pages. Set it to `true` to display them. The About
-  page still describes the material's provenance; hiding a notice does not
-  verify external links or change original Markdown descriptions.
+  body is independently editable in Markdown; hiding a notice does not
+  verify external links or change original resource descriptions.
 
 Use actual resource IDs from `src/content/listings/` for `featuredIds`; an unknown
 ID intentionally fails the build. Internal navigation paths use the root-domain

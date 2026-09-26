@@ -3,7 +3,9 @@ import { readFile } from 'node:fs/promises';
 import { resolve } from 'node:path';
 import test, { before } from 'node:test';
 import { build } from 'astro';
-import { aboutConfig, navBarConfig, profileConfig, siteConfig } from '../src/config.ts';
+import { navBarConfig, profileConfig, siteConfig } from '../src/config.ts';
+
+const aboutSourcePath = resolve('src/content/pages/about.md');
 
 const homePagePath = resolve('dist/index.html');
 const aboutPagePath = resolve('dist/about/index.html');
@@ -21,16 +23,11 @@ test('home search sends the query to the resources directory', () => {
   assert.match(homePage, /<input[^>]*type="search"[^>]*name="q"[^>]*>/);
 });
 
-test('home cards link to real resource details without category controls', () => {
-  for (const resource of [
-    { id: 'mtf-wiki', name: 'mtf.wiki' },
-    { id: 'thai-pharmacy', name: '泰记药房' },
-    { id: 'trans-survival-guide', name: '跨性别者邪修生存指南' },
-  ]) {
-    assert.match(homePage, new RegExp(`href="/resources/${resource.id}/"`));
-    assert.ok(homePage.includes(resource.name), `home page should feature ${resource.name}`);
-  }
-
+test('home cards follow configured featured IDs without category controls', () => {
+  const featuredSection = homePage.match(/<section class="featured-section"[\s\S]*?<\/section>/)?.[0];
+  assert.ok(featuredSection, 'home should render featured cards');
+  const linkedIds = [...featuredSection.matchAll(/href="\/resources\/([^/]+)\/"/g)].map((match) => match[1]);
+  assert.deepEqual(linkedIds, siteConfig.featuredIds);
   assert.doesNotMatch(homePage, /aria-label="分类"|class="[^"]*category-filter|href="\/resources\/\?category=/);
 });
 
@@ -44,16 +41,23 @@ test('home uses configurable site identity, navigation, and featured resources',
   assert.ok(homePage.includes('从这里开始了解'));
 });
 
-test('about page describes the project without claiming resource verification', () => {
+test('about page renders editable Markdown and configured profile links', async () => {
+  const source = await readFile(aboutSourcePath, 'utf8');
+  const title = source.match(/^title: "([^"]+)"$/m)?.[1];
+  const description = source.match(/^description: "([^"]+)"$/m)?.[1];
+  assert.ok(title, 'About Markdown must have a title');
+  assert.ok(description, 'About Markdown must have a description');
   assert.match(aboutPage, /<main[^>]*id="main-content"/);
-  assert.ok(aboutPage.includes(aboutConfig.heading));
-  assert.ok(aboutPage.includes(profileConfig.links[0].url));
-  assert.ok(aboutPage.includes('未经独立复核'));
+  assert.ok(aboutPage.includes(`<h1 id="about-title">${title}</h1>`));
+  assert.ok(aboutPage.includes(`<meta name="description" content="${description}"`));
+  assert.match(aboutPage, /<div class="about-markdown"><(?:p|h2|h3|ul|ol|blockquote|pre)/);
+  for (const { url } of profileConfig.links) {
+    assert.ok(aboutPage.includes(`href="${url}"`), `About page should include ${url}`);
+  }
 });
 
-test('historical snapshot notices are hidden by default but original descriptions remain', () => {
-  assert.equal(siteConfig.showHistoricalNotice, false);
-  assert.doesNotMatch(homePage, /class="[^"]*history-note/);
-  assert.doesNotMatch(aboutPage, /class="[^"]*history-note/);
+test('snapshot notices follow configuration instead of a fixed expectation', () => {
+  assert.equal(/class="[^"]*history-note/.test(homePage), siteConfig.showHistoricalNotice);
+  assert.equal(/class="[^"]*history-note/.test(aboutPage), false);
   assert.doesNotMatch(homePage, /class="[^"]*(?:availability|status-badge)[^"]*"/);
 });

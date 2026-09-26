@@ -8,8 +8,8 @@ export const siteConfig = {
   lang: 'zh-CN',
   description: '收录跨性别相关资源与原有说明，供读者进一步了解。',
   themeColor: {
-    hue: 270, // 0–360; visitors can change it unless fixed is true.
-    fixed: false,
+    hue: 348, // 0–360; visitors can change it unless fixed is true.
+    fixed: true,
   },
   banner: {
     enable: false,
@@ -34,15 +34,8 @@ export const profileConfig: { name: string; bio: string; avatar?: string; links:
   name: 'MtF Experiences',
   bio: '跨性别相关资源汇总。',
   links: [
+    { name: 'Twitter', url: 'https://twitter.com/Wanda12300' },
     { name: 'GitHub', url: 'https://github.com/Wanda12300/MtF-Experiences' },
-  ],
-};
-
-export const aboutConfig = {
-  heading: '关于 MtF Experiences',
-  paragraphs: [
-    '本项目汇集跨性别相关资源，包括 Wiki 百科和 HRT 资料；本站将原有条目整理为可检索的目录。',
-    '资源名称、分类和说明沿用上游原始收录，未经独立复核。外部网站及其内容可能发生变化，请自行判断；这里的收录不构成医疗建议。',
   ],
 };
 

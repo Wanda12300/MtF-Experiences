@@ -4,6 +4,7 @@ import { join, resolve } from 'node:path';
 import test, { after, before } from 'node:test';
 import { build } from 'astro';
 import { resourceCategories } from '../src/content/categories/index.ts';
+import { siteConfig } from '../src/config.ts';
 
 const listingsDirectory = resolve('src/content/listings');
 let resourcesOutputDirectory: string;
@@ -38,7 +39,7 @@ test('every Markdown listing has a static detail page with its source category a
     assert.ok(page, `${id} should have its own static detail page`);
     assert.match(page, /<main[^>]*class="resource-detail-page"/);
     assert.match(page, /class="resource-detail-layout"/);
-    assert.doesNotMatch(page, /class="[^"]*history-note/);
+    assert.equal(/class="[^"]*history-note/.test(page), siteConfig.showHistoricalNotice);
     assert.match(page, /原始说明/);
     assert.match(page, /所属分类/);
 

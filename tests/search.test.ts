@@ -4,6 +4,7 @@ import { join, resolve } from 'node:path';
 import { runInNewContext } from 'node:vm';
 import test, { after, before } from 'node:test';
 import { build } from 'astro';
+import { resourceCategories } from '../src/content/categories/index.ts';
 
 const listingsDirectory = resolve('src/content/listings');
 let resourcesPage: string;
@@ -33,14 +34,22 @@ test('resources page lists every listing under its source category with a detail
   for (const id of listingIds) {
     assert.match(resourcesPage, new RegExp(`href="/resources/${id}/"`), `${id} should link to its detail page`);
   }
-  for (const category of ['wiki-baike', 'hrt-shops', 'hrt-guides', 'other']) {
+  for (const { slug: category } of resourceCategories) {
     assert.match(resourcesPage, new RegExp(`data-category-filter="${category}"`));
   }
   assert.match(resourcesPage, /action="\/resources\/"[^>]*method="get"/);
   assert.match(resourcesPage, /name="q"/);
 
-  assert.match(resourcesPage, /<del>印度直邮购<\/del>/, 'the source strikethrough should remain visible');
-  assert.match(resourcesPage, /href="\/resources\/pdd\/"/, 'listings without external URLs still need detail cards');
+  const sources = await Promise.all(listingIds.map(async (id) => ({
+    id,
+    content: await readFile(join(listingsDirectory, `${id}.md`), 'utf8'),
+  })));
+  const struck = sources.find(({ content }) => /^strikethrough: true$/m.test(content));
+  assert.ok(struck, 'source should include a historically struck-through listing');
+  assert.match(resourcesPage, new RegExp(`href="/resources/${struck.id}/"[^>]*>[\\s\\S]*?<del>`), 'source strikethrough should remain visible');
+  const noLink = sources.find(({ content }) => !/^url:/m.test(content));
+  assert.ok(noLink, 'source should include a listing without an external URL');
+  assert.match(resourcesPage, new RegExp(`href="/resources/${noLink.id}/"`), 'listings without external URLs still need detail cards');
   assert.doesNotMatch(resourcesPage, /class="[^"]*(?:availability|status-badge)[^"]*"/);
 });
 
