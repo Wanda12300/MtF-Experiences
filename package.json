@@ -14,7 +14,8 @@
     "test": "node --experimental-strip-types --test --test-concurrency=1 tests/*.test.ts"
   },
   "dependencies": {
-    "astro": "^7.1.6"
+    "astro": "^7.1.6",
+    "sakana-widget": "^3.1.0"
   },
   "devDependencies": {
     "@astrojs/check": "^0.9.4",

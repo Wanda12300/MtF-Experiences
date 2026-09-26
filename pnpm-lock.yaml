@@ -11,6 +11,9 @@ importers:
       astro:
         specifier: ^7.1.6
         version: 7.3.5(@types/node@24.13.6)(yaml@2.9.1)
+      sakana-widget:
+        specifier: ^3.1.0
+        version: 3.1.0
     devDependencies:
       '@astrojs/check':
         specifier: ^0.9.4
@@ -1334,6 +1337,9 @@ packages:
     resolution: {integrity: sha512-OxkA08pSryMK7B3XiFA09B4OJ1xJMPgIYCBMY2xchzpqgBGsV1o0DetPAE+Sl3N3L4oCPiEzmHVSOj7iR04Zog==}
     engines: {node: ^20.19.0 || >=22.12.0}
     hasBin: true
+
+  sakana-widget@3.1.0:
+    resolution: {integrity: sha512-ndo5X3Rs1MaCbSeaStjHFylM3Wi/aPjq5HeVIBDITgqYCYtH2ym/zzeW0TgAzNr1KWlc5Nw+pCMKpvOrXmdNZQ==}
 
   satteri@0.10.5:
     resolution: {integrity: sha512-Ao1LKpAEa9Wdg0otgbVKViZHEq9ebdXe4DMrp3s9vQAU0HNIuHnFEuMuOcm0ZIXyV0Yzxj91NvhLpvXZJO/5ZQ==}
@@ -2948,6 +2954,8 @@ snapshots:
       '@rolldown/binding-openharmony-arm64': 1.2.10
       '@rolldown/binding-win32-arm64-msvc': 1.2.10
       '@rolldown/binding-win32-x64-msvc': 1.2.10
+
+  sakana-widget@3.1.0: {}
 
   satteri@0.10.5:
     dependencies:

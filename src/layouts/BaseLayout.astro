@@ -1,5 +1,6 @@
 ---
 import '../styles/app.css';
+import 'sakana-widget/lib/index.css';
 import { licenseConfig, navBarConfig, profileConfig, siteConfig, textConfig } from '../config';
 
 interface Props {
@@ -84,6 +85,13 @@ const showBanner = siteConfig.banner.enable && siteConfig.banner.src;
         <p><a href="/about/">{textConfig.footer.about} {profileConfig.name}</a></p>
       </footer>
     </div>
+
+    <div id="sakana-widget" aria-label="Sakana 互动小组件"></div>
+    <script>
+      import SakanaWidget from 'sakana-widget';
+
+      new SakanaWidget({ autoFit: true, title: true }).mount('#sakana-widget');
+    </script>
 
     <script is:inline>
       const hueInput = document.querySelector('#theme-hue');

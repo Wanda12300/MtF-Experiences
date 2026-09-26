@@ -82,6 +82,23 @@ input:focus-visible {
   margin-inline: auto;
 }
 
+#sakana-widget {
+  position: fixed;
+  z-index: 4;
+  left: max(0.75rem, env(safe-area-inset-left));
+  bottom: max(0.75rem, env(safe-area-inset-bottom));
+  width: 160px;
+  height: 160px;
+  pointer-events: none;
+}
+
+@media (max-width: 600px) {
+  #sakana-widget {
+    width: 120px;
+    height: 120px;
+  }
+}
+
 .skip-link,
 .visually-hidden {
   position: absolute;
