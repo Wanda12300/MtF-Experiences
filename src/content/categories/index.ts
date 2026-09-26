@@ -1,8 +1,11 @@
-export const resourceCategories = [
-  { slug: 'wiki-baike', name: 'wiki百科：', sourceHeading: ' wiki百科：', order: 1 },
-  { slug: 'hrt-shops', name: 'HRT药物购买：', sourceHeading: ' HRT药物购买：', order: 2 },
-  { slug: 'hrt-guides', name: 'HRT相关资料：', sourceHeading: ' HRT相关资料：', order: 3 },
-  { slug: 'other', name: '其他：', sourceHeading: '其他：', order: 4 },
-] as const;
+import { z } from 'astro/zod';
+import categories from './categories.json' with { type: 'json' };
 
-export type ResourceCategorySlug = (typeof resourceCategories)[number]['slug'];
+const categorySchema = z.array(z.object({
+  slug: z.string().min(1),
+  name: z.string().min(1),
+  order: z.number().int().nonnegative(),
+}).strict()).min(1).refine((items) => new Set(items.map(({ slug }) => slug)).size === items.length,
+  'Category slugs must be unique');
+
+export const resourceCategories = categorySchema.parse(categories).sort((a, b) => a.order - b.order);

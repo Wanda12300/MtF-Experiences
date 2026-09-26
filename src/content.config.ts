@@ -12,6 +12,7 @@ const listings = defineCollection({
     category: z.string().refine((slug) => categorySlugs.has(slug), 'Unknown resource category'),
     url: z.url().refine((value) => /^https?:\/\//i.test(value), 'URL must use HTTP or HTTPS').optional(),
     strikethrough: z.boolean().default(false),
+    featuredOrder: z.number().int().positive().optional(),
   }).strict(),
 });
 
@@ -20,6 +21,12 @@ const pages = defineCollection({
   schema: z.object({
     title: z.string().min(1),
     description: z.string().min(1),
+    pageTitle: z.string().min(1).optional(),
+    intro: z.string().min(1).optional(),
+    searchHint: z.string().min(1).optional(),
+    featuredEyebrow: z.string().min(1).optional(),
+    featuredTitle: z.string().min(1).optional(),
+    viewAll: z.string().min(1).optional(),
   }).strict(),
 });
 

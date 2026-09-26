@@ -1,24 +1,30 @@
 ---
-import { getCollection } from 'astro:content';
+import { getCollection, getEntry } from 'astro:content';
 import ResourceCard from '../components/ResourceCard.astro';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import { siteConfig, textConfig } from '../config';
 
+const home = await getEntry('pages', 'index');
+if (!home?.data.pageTitle || !home.data.intro || !home.data.searchHint
+  || !home.data.featuredEyebrow || !home.data.featuredTitle || !home.data.viewAll) {
+  throw new Error('Home page frontmatter is incomplete: src/content/pages/index.md');
+}
+
 const listings = await getCollection('listings');
-const listingsById = new Map(listings.map((listing) => [listing.id, listing]));
-const featuredListings = siteConfig.featuredIds.map((id) => {
-  const listing = listingsById.get(id);
-  if (!listing) throw new Error(`Featured resource not found: ${id}`);
-  return listing;
-});
+const featuredListings = listings
+  .filter(({ data }) => data.featuredOrder !== undefined)
+  .sort((a, b) => a.data.featuredOrder! - b.data.featuredOrder!);
+if (new Set(featuredListings.map(({ data }) => data.featuredOrder)).size !== featuredListings.length) {
+  throw new Error('Featured resource positions must be unique');
+}
 ---
 
-<BaseLayout title={textConfig.common.home}>
+<BaseLayout title={home.data.pageTitle} description={home.data.description}>
   <main id="main-content" class="home-page">
     <section class="intro-panel" aria-labelledby="home-title">
       <p class="eyebrow">{siteConfig.title}</p>
-      <h1 id="home-title">{siteConfig.subtitle}</h1>
-      <p class="intro-copy">{textConfig.home.intro}</p>
+      <h1 id="home-title">{home.data.title}</h1>
+      <p class="intro-copy">{home.data.intro}</p>
 
       <form class="home-search" action="/resources/" method="get" role="search">
         <label class="visually-hidden" for="resource-query">{textConfig.common.searchLabel}</label>
@@ -37,21 +43,21 @@ const featuredListings = siteConfig.featuredIds.map((id) => {
           <span>{textConfig.common.searchButton}</span>
         </button>
       </form>
-      <p class="search-hint">{textConfig.home.searchHint}</p>
+      <p class="search-hint">{home.data.searchHint}</p>
     </section>
 
-    <section class="featured-section" aria-labelledby="featured-title">
+    {featuredListings.length > 0 && <section class="featured-section" aria-labelledby="featured-title">
       <div class="section-heading">
         <div>
-          <p class="eyebrow">{textConfig.home.featuredEyebrow}</p>
-          <h2 id="featured-title">{textConfig.home.featuredTitle}</h2>
+          <p class="eyebrow">{home.data.featuredEyebrow}</p>
+          <h2 id="featured-title">{home.data.featuredTitle}</h2>
         </div>
-        <a class="all-resources-link" href="/resources/">{textConfig.home.viewAll} <span aria-hidden="true">→</span></a>
+        <a class="all-resources-link" href="/resources/">{home.data.viewAll} <span aria-hidden="true">→</span></a>
       </div>
 
       <div class="resource-grid">
         {featuredListings.map((entry) => <ResourceCard entry={entry} />)}
       </div>
-    </section>
+    </section>}
   </main>
 </BaseLayout>

@@ -8,17 +8,19 @@ in frontmatter. These historical descriptions and external links have not been
 independently reviewed. Entries without an upstream hyperlink do not receive an
 invented URL.
 
-Categories and their display order are maintained in
-`src/content/categories/index.ts`.
+Category labels, slugs, and display order are maintained in
+`src/content/categories/categories.json`. Listing `category` values must match a slug in that file.
 
 ## Customize
 
-Edit `src/config.ts` to set the site title, subtitle, language, metadata description,
-navigation, featured listing IDs, profile links, interface copy (`textConfig`),
-and visual options. Edit `src/content/pages/about.md` for the About page
-heading (`title`), page metadata
-(`description`), and Markdown body; profile name, bio, avatar, and links remain
-in `src/config.ts`:
+Edit `src/config.ts` for site identity, navigation, profile links, visual options,
+and shared control labels (`textConfig`). Page-specific titles, metadata, and copy
+live in Markdown frontmatter under `src/content/pages/`: `index.md` for the homepage,
+`resources.md` for the directory, and `about.md` for the About page. Each
+resource detail page reads its own listing's frontmatter and body; shared UI
+labels stay in `textConfig`. The About body is also Markdown; profile name,
+bio, avatar, and links remain in
+`src/config.ts`:
 
 - `siteConfig.themeColor.hue` sets the initial accent color (0–360). Set `fixed: true`
   to hide the visitor color slider and ignore previously saved color choices. The
@@ -31,13 +33,14 @@ in `src/config.ts`:
   light/dark `theme`. `licenseConfig` is disabled until the owner selects a
   license; enabling it does not license upstream resource descriptions.
 
-Resource descriptions are independent of interface copy and remain editable in
-`src/content/listings/`. The About body is independently editable in Markdown.
+Resource descriptions and per-resource attributes remain editable in
+`src/content/listings/`. Set `featuredOrder` in a listing's frontmatter to feature
+it on the homepage; positive, unique numbers determine display order. Leave it
+out to omit the listing from that section. The section is hidden if nothing is
+featured. Category labels and order live in `src/content/categories/categories.json`.
 
-Use actual resource IDs from `src/content/listings/` for `featuredIds`; an unknown
-ID intentionally fails the build. Internal navigation paths use the root-domain
-hosting described in the upstream README. No availability or verification status
-is generated for listings.
+Internal navigation paths use the root-domain hosting described in the upstream
+README. No availability or verification status is generated for listings.
 
 ## Develop
 

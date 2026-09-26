@@ -14,7 +14,18 @@ let aboutPage: string;
 let resourcesPage: string;
 let detailPages: Map<string, string>;
 let searchScript: string;
-type ListingSource = { id: string; name: string; category: string; body: string; url?: string; strikethrough: boolean };
+
+async function pageFields(id: string): Promise<Record<string, string>> {
+  const source = await readFile(resolve('src/content/pages', `${id}.md`), 'utf8');
+  const end = source.indexOf('\n---\n', 4);
+  assert.ok(source.startsWith('---\n') && end > 0);
+  return Object.fromEntries(source.slice(4, end).split('\n').map((line) => {
+    const colon = line.indexOf(': ');
+    assert.ok(colon > 0);
+    return [line.slice(0, colon), JSON.parse(line.slice(colon + 2)) as string];
+  }));
+}
+type ListingSource = { id: string; name: string; category: string; body: string; url?: string; strikethrough: boolean; featuredOrder?: number };
 let listings: ListingSource[];
 
 async function readListing(id: string): Promise<ListingSource> {
@@ -35,6 +46,7 @@ async function readListing(id: string): Promise<ListingSource> {
     body: source.slice(source.indexOf('\n---\n', 4) + 5).trim(),
     url: fields.url ? JSON.parse(fields.url) as string : undefined,
     strikethrough: fields.strikethrough === 'true',
+    featuredOrder: fields.featuredOrder ? Number(fields.featuredOrder) : undefined,
   };
 }
 
@@ -59,17 +71,27 @@ after(async () => {
   if (outputDirectory) await rm(outputDirectory, { recursive: true, force: true });
 });
 
-test('home renders configured text, navigation, featured cards, and search route', () => {
-  assert.ok(homePage.includes(`<title>${textConfig.common.home} | ${siteConfig.title}</title>`));
-  assert.ok(homePage.includes(textConfig.home.intro));
+test('home renders Markdown page copy, navigation, featured cards, and search route', async () => {
+  const home = await pageFields('index');
+  assert.ok(homePage.includes(`<title>${home.pageTitle} | ${siteConfig.title}</title>`));
+  assert.ok(homePage.includes(`<h1 id="home-title">${home.title}</h1>`));
+  assert.ok(homePage.includes(home.intro));
   assert.ok(homePage.includes(`--theme-hue: ${siteConfig.themeColor.hue}`));
   for (const { url } of navBarConfig.links) assert.ok(homePage.includes(`href="${url}"`));
   const featured = homePage.match(/<section class="featured-section"[\s\S]*?<\/section>/)?.[0];
-  assert.ok(featured);
-  assert.deepEqual([...featured.matchAll(/href="\/resources\/([^/]+)\/"/g)].map((match) => match[1]), siteConfig.featuredIds);
+  const expected = listings.filter(({ featuredOrder }) => featuredOrder !== undefined)
+    .sort((a, b) => a.featuredOrder! - b.featuredOrder!).map(({ id }) => id);
+  assert.equal(Boolean(featured), expected.length > 0);
+  if (featured) assert.deepEqual([...featured.matchAll(/href="\/resources\/([^/]+)\/"/g)].map((match) => match[1]), expected);
   assert.match(homePage, /<form[^>]*action="\/resources\/"[^>]*method="get"/);
   assert.match(homePage, /<input[^>]*type="search"[^>]*name="q"/);
   assert.doesNotMatch(homePage, /data-category-filter/);
+});
+
+test('directory renders page copy from Markdown frontmatter', async () => {
+  const directory = await pageFields('resources');
+  assert.ok(resourcesPage.includes(`<h1 id="resources-title">${directory.title}</h1>`));
+  assert.ok(resourcesPage.includes(directory.intro));
 });
 
 test('About renders editable Markdown and configured profile links', async () => {
@@ -93,6 +115,8 @@ test('small screens use single-column resource cards', async () => {
 test('current Markdown listings generate searchable cards and detail pages', () => {
   assert.ok(listings.length > 0);
   assert.equal(new Set(listings.map(({ id }) => id)).size, listings.length);
+  const featuredOrders = listings.flatMap(({ featuredOrder }) => featuredOrder === undefined ? [] : [featuredOrder]);
+  assert.equal(new Set(featuredOrders).size, featuredOrders.length);
   assert.equal(detailPages.size, listings.length);
   assert.equal([...resourcesPage.matchAll(/<a\b(?=[^>]*\bdata-resource-card\b)[^>]*>/g)].length, listings.length);
   for (const { id, category, body } of listings) {

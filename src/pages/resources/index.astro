@@ -1,9 +1,12 @@
 ---
-import { getCollection } from 'astro:content';
+import { getCollection, getEntry } from 'astro:content';
 import ResourceSearch from '../../components/ResourceSearch.astro';
 import { resourceCategories } from '../../content/categories/index';
 import BaseLayout from '../../layouts/BaseLayout.astro';
-import { siteConfig, textConfig } from '../../config';
+import { siteConfig } from '../../config';
+
+const directory = await getEntry('pages', 'resources');
+if (!directory?.data.intro) throw new Error('Directory frontmatter is incomplete: src/content/pages/resources.md');
 
 const listings = await getCollection('listings');
 const categoryOrder = new Map<string, number>(resourceCategories.map(({ slug, order }) => [slug, order]));
@@ -13,12 +16,12 @@ const orderedListings = [...listings].sort((left, right) =>
 );
 ---
 
-<BaseLayout title={textConfig.common.resources}>
+<BaseLayout title={directory.data.title} description={directory.data.description}>
   <main id="main-content" class="resources-page">
     <section class="intro-panel resources-intro" aria-labelledby="resources-title">
       <p class="eyebrow">{siteConfig.title}</p>
-      <h1 id="resources-title">{textConfig.common.resources}</h1>
-      <p class="intro-copy">{textConfig.directory.intro}</p>
+      <h1 id="resources-title">{directory.data.title}</h1>
+      <p class="intro-copy">{directory.data.intro}</p>
     </section>
 
     <ResourceSearch entries={orderedListings} categories={resourceCategories} />
