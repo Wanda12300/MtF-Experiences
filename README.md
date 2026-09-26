@@ -14,8 +14,9 @@ Categories and their display order are maintained in
 ## Customize
 
 Edit `src/config.ts` to set the site title, subtitle, language, metadata description,
-navigation, featured listing IDs, profile links, and visual options. Edit
-`src/content/pages/about.md` for the About page heading (`title`), page metadata
+navigation, featured listing IDs, profile links, interface copy (`textConfig`),
+and visual options. Edit `src/content/pages/about.md` for the About page
+heading (`title`), page metadata
 (`description`), and Markdown body; profile name, bio, avatar, and links remain
 in `src/config.ts`:
 
@@ -29,10 +30,9 @@ in `src/config.ts`:
 - `siteConfig.favicon` accepts one or more icon paths with optional `sizes` and
   light/dark `theme`. `licenseConfig` is disabled until the owner selects a
   license; enabling it does not license upstream resource descriptions.
-- `siteConfig.showHistoricalNotice` defaults to `false` to omit the prominent
-  snapshot notices on all pages. Set it to `true` to display them. The About
-  body is independently editable in Markdown; hiding a notice does not
-  verify external links or change original resource descriptions.
+
+Resource descriptions are independent of interface copy and remain editable in
+`src/content/listings/`. The About body is independently editable in Markdown.
 
 Use actual resource IDs from `src/content/listings/` for `featuredIds`; an unknown
 ID intentionally fails the build. Internal navigation paths use the root-domain

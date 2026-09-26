@@ -1,6 +1,6 @@
 ---
 import '../styles/app.css';
-import { licenseConfig, navBarConfig, profileConfig, siteConfig } from '../config';
+import { licenseConfig, navBarConfig, profileConfig, siteConfig, textConfig } from '../config';
 
 interface Props {
   title?: string;
@@ -40,25 +40,25 @@ const showBanner = siteConfig.banner.enable && siteConfig.banner.src;
     </script>
   </head>
   <body>
-    <a class="skip-link" href="#main-content">跳至主要内容</a>
+    <a class="skip-link" href="#main-content">{textConfig.common.skipToContent}</a>
     <div class="site-frame">
       <header class="site-header">
-        <a class="brand" href="/" aria-label={`${siteConfig.title} 首页`}>
+        <a class="brand" href="/" aria-label={`${siteConfig.title} ${textConfig.common.home}`}>
           <span class="brand-mark" aria-hidden="true">{siteConfig.title.charAt(0)}</span>
           <span>{siteConfig.title}</span>
         </a>
-        <nav class="main-nav" aria-label="主导航">
+        <nav class="main-nav" aria-label={textConfig.common.navigation}>
           {navBarConfig.links.map(({ name, url, external }) => (
             <a href={url} target={external ? '_blank' : undefined} rel={external ? 'noopener noreferrer' : undefined}
               aria-current={!external && (url === '/' ? Astro.url.pathname === '/' : Astro.url.pathname.startsWith(url)) ? 'page' : undefined}>{name}</a>
           ))}
           {!siteConfig.themeColor.fixed && (
-            <label class="hue-control" title="调整主题色">
-              <span class="visually-hidden">主题色</span>
-              <input id="theme-hue" type="range" min="0" max="360" value={siteConfig.themeColor.hue} aria-label="主题色" />
+            <label class="hue-control" title={textConfig.common.themeColor}>
+              <span class="visually-hidden">{textConfig.common.themeColor}</span>
+              <input id="theme-hue" type="range" min="0" max="360" value={siteConfig.themeColor.hue} aria-label={textConfig.common.themeColor} />
             </label>
           )}
-          <button class="theme-toggle" type="button" id="theme-toggle" aria-label="切换明暗主题" title="切换明暗主题">
+          <button class="theme-toggle" type="button" id="theme-toggle" aria-label={textConfig.common.toggleTheme} title={textConfig.common.toggleTheme}>
             <span aria-hidden="true">◐</span>
           </button>
         </nav>
@@ -78,11 +78,10 @@ const showBanner = siteConfig.banner.enable && siteConfig.banner.src;
 
       <footer class="site-footer">
         <p>{siteConfig.title} · {siteConfig.subtitle}</p>
-        {siteConfig.showHistoricalNotice && <p>条目沿用上游原始收录，未经独立复核；请在访问外部网站前自行判断。</p>}
         {licenseConfig.enable && licenseConfig.name && (
           <p>{licenseConfig.url ? <a href={licenseConfig.url}>{licenseConfig.name}</a> : licenseConfig.name}</p>
         )}
-        <p><a href="/about/">关于 {profileConfig.name}</a></p>
+        <p><a href="/about/">{textConfig.footer.about} {profileConfig.name}</a></p>
       </footer>
     </div>
 

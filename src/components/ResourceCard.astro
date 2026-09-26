@@ -1,5 +1,6 @@
 ---
 import type { CollectionEntry } from 'astro:content';
+import { textConfig } from '../config';
 
 interface Props {
   entry: CollectionEntry<'listings'>;
@@ -14,9 +15,7 @@ const description = entry.body?.trim() ?? '';
 <a
   class="resource-card"
   href={`/resources/${entry.id}/`}
-  aria-label={entry.data.strikethrough
-    ? `查看${entry.data.name}详情（上游原有删除线标记）`
-    : `查看${entry.data.name}详情`}
+  aria-label={textConfig.card.label(entry.data.name, entry.data.strikethrough)}
   data-resource-card={searchable ? '' : undefined}
   data-category={searchable ? entry.data.category : undefined}
   data-search-text={searchable ? `${entry.data.name} ${description}` : undefined}
@@ -27,5 +26,5 @@ const description = entry.body?.trim() ?? '';
     <span class="resource-card-arrow" aria-hidden="true">→</span>
   </div>
   <p>{description}</p>
-  <span class="resource-card-action">查看详情</span>
+  <span class="resource-card-action">{textConfig.card.open}</span>
 </a>

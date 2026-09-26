@@ -1,6 +1,7 @@
 ---
 import type { CollectionEntry } from 'astro:content';
 import ResourceCard from './ResourceCard.astro';
+import { textConfig } from '../config';
 
 interface Props {
   entries: CollectionEntry<'listings'>[];
@@ -14,15 +15,15 @@ const categoryCounts = new Map<string, number>(
 );
 ---
 
-<section class="resource-directory" data-resource-search aria-label="资源目录筛选">
+<section class="resource-directory" data-resource-search data-count-template={textConfig.directory.count} data-search-count-template={textConfig.directory.searchCount} aria-label={textConfig.directory.filterLabel}>
   <div class="resource-directory-controls">
     <form class="home-search resource-search-form" action="/resources/" method="get" role="search">
-      <label class="visually-hidden" for="directory-query">搜索资源名称或说明</label>
+      <label class="visually-hidden" for="directory-query">{textConfig.common.searchLabel}</label>
       <input
         id="directory-query"
         type="search"
         name="q"
-        placeholder="搜索资源名称或说明…"
+        placeholder={textConfig.common.searchPlaceholder}
         autocomplete="off"
       />
       <button type="submit">
@@ -30,14 +31,14 @@ const categoryCounts = new Map<string, number>(
           <circle cx="10.8" cy="10.8" r="6.3" />
           <path d="m15.5 15.5 4.2 4.2" />
         </svg>
-        <span>搜索</span>
+        <span>{textConfig.common.searchButton}</span>
       </button>
     </form>
-    <button class="resource-search-clear" type="button" data-clear-search hidden>清除搜索词</button>
+    <button class="resource-search-clear" type="button" data-clear-search hidden>{textConfig.directory.clearSearch}</button>
 
-    <div class="resource-category-filters" role="group" aria-label="按分类筛选资源">
+    <div class="resource-category-filters" role="group" aria-label={textConfig.directory.categoriesLabel}>
       <button class="resource-category-button" type="button" data-category-filter="all" aria-pressed="true">
-        全部 <span>{entries.length}</span>
+        {textConfig.directory.allCategories} <span>{entries.length}</span>
       </button>
       {categories.map((category) => (
         <button
@@ -53,10 +54,10 @@ const categoryCounts = new Map<string, number>(
   </div>
 
   <p class="resource-search-status" data-result-status role="status" aria-live="polite">
-    显示 {entries.length} 项资源。
+    {textConfig.directory.count.replace('{count}', String(entries.length))}
   </p>
   <p class="resource-search-empty" data-empty-state hidden>
-    没有找到匹配的资源。请调整搜索词或分类，或清除搜索词后重试。
+    {textConfig.directory.empty}
   </p>
 
   <div class="resource-grid resource-search-results">
@@ -98,9 +99,9 @@ const categoryCounts = new Map<string, number>(
 
       clearButton.hidden = query.length === 0;
       emptyState.hidden = visibleCount > 0;
-      resultStatus.textContent = query
-        ? `搜索“${searchInput.value.trim()}”：找到 ${visibleCount} 项资源。`
-        : `显示 ${visibleCount} 项资源。`;
+      resultStatus.textContent = (query ? searchRoot.dataset.searchCountTemplate : searchRoot.dataset.countTemplate)
+        .replace('{count}', String(visibleCount))
+        .replace('{query}', searchInput.value.trim());
     }
 
     searchForm.addEventListener('submit', (event) => {

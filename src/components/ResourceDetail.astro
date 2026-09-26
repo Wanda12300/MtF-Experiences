@@ -1,6 +1,6 @@
 ---
 import type { CollectionEntry } from 'astro:content';
-import { siteConfig } from '../config';
+import { textConfig } from '../config';
 
 interface Props {
   entry: CollectionEntry<'listings'>;
@@ -15,28 +15,18 @@ const externalHost = externalUrl ? new URL(externalUrl).host : undefined;
 
 <main id="main-content" class="resource-detail-page">
   <nav class="resource-breadcrumb" aria-label="面包屑">
-    <a href="/resources/">资源目录</a>
+    <a href="/resources/">{textConfig.common.resources}</a>
     <span aria-hidden="true">/</span>
     <span aria-current="page">{entry.data.name}</span>
   </nav>
 
   <div class="resource-detail-layout">
     <article class="resource-detail-main">
-      <p class="eyebrow">资源详情</p>
+      <p class="eyebrow">{textConfig.detail.eyebrow}</p>
       <h1>{entry.data.strikethrough ? <del>{entry.data.name}</del> : entry.data.name}</h1>
 
-      {siteConfig.showHistoricalNotice && (
-        <aside class="history-note resource-detail-history" aria-label="历史快照提示">
-          <span class="note-mark" aria-hidden="true">i</span>
-          <div>
-            <h2>历史快照 · 未经独立复核</h2>
-            <p>以下说明沿用上游页面原文，未经独立复核。外链、内容和商品信息可能已经变化，请勿视为当前状态或医疗建议。</p>
-          </div>
-        </aside>
-      )}
-
       <section class="resource-detail-description" aria-labelledby="resource-description-title">
-        <h2 id="resource-description-title">原始说明</h2>
+        <h2 id="resource-description-title">{textConfig.detail.description}</h2>
         <div class:list={["resource-detail-original", { "resource-detail-original-struck": entry.data.strikethrough }]}>
           {entry.data.strikethrough ? <del><p>{description}</p></del> : <p>{description}</p>}
         </div>
@@ -45,16 +35,16 @@ const externalHost = externalUrl ? new URL(externalUrl).host : undefined;
 
     <aside class="resource-detail-sidebar" aria-labelledby="resource-info-title">
       <section class="resource-detail-info">
-        <p class="eyebrow">收录信息</p>
-        <h2 id="resource-info-title">基本信息</h2>
+        <p class="eyebrow">{textConfig.detail.infoEyebrow}</p>
+        <h2 id="resource-info-title">{textConfig.detail.infoTitle}</h2>
         <dl>
           <div>
-            <dt>所属分类</dt>
+            <dt>{textConfig.detail.category}</dt>
             <dd>{categoryName}</dd>
           </div>
           <div>
-            <dt>来源</dt>
-            <dd>上游页面原始收录</dd>
+            <dt>{textConfig.detail.source}</dt>
+            <dd>{textConfig.detail.sourceValue}</dd>
           </div>
         </dl>
 
@@ -64,18 +54,18 @@ const externalHost = externalUrl ? new URL(externalUrl).host : undefined;
             href={externalUrl}
             target="_blank"
             rel="noopener noreferrer"
-            aria-label={`在外部网站 ${externalHost} 打开 ${entry.data.name}`}
+            aria-label={textConfig.detail.externalLabel(externalHost, entry.data.name)}
           >
-            <span>访问外部网站</span>
+            <span>{textConfig.detail.external}</span>
             <span class="resource-detail-external-host">{externalHost}</span>
             <span class="resource-detail-external-arrow" aria-hidden="true">↗</span>
           </a>
         ) : (
-          <p class="resource-detail-no-link">此条目在上游原始收录中未提供外部链接。</p>
+          <p class="resource-detail-no-link">{textConfig.detail.noExternal}</p>
         )}
       </section>
 
-      <a class="resource-detail-back-link" href="/resources/">← 返回资源目录</a>
+      <a class="resource-detail-back-link" href="/resources/">← {textConfig.detail.back}</a>
     </aside>
   </div>
 </main>

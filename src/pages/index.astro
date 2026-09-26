@@ -2,7 +2,8 @@
 import { getCollection } from 'astro:content';
 import ResourceCard from '../components/ResourceCard.astro';
 import BaseLayout from '../layouts/BaseLayout.astro';
-import { siteConfig } from '../config';
+import { siteConfig, textConfig } from '../config';
+
 const listings = await getCollection('listings');
 const listingsById = new Map(listings.map((listing) => [listing.id, listing]));
 const featuredListings = siteConfig.featuredIds.map((id) => {
@@ -12,20 +13,20 @@ const featuredListings = siteConfig.featuredIds.map((id) => {
 });
 ---
 
-<BaseLayout title="首页">
+<BaseLayout title={textConfig.common.home}>
   <main id="main-content" class="home-page">
     <section class="intro-panel" aria-labelledby="home-title">
       <p class="eyebrow">{siteConfig.title}</p>
       <h1 id="home-title">{siteConfig.subtitle}</h1>
-      <p class="intro-copy">整理上游收录的跨性别相关资源与原有说明，帮助你进一步了解并自行判断。</p>
+      <p class="intro-copy">{textConfig.home.intro}</p>
 
       <form class="home-search" action="/resources/" method="get" role="search">
-        <label class="visually-hidden" for="resource-query">搜索资源名称或说明</label>
+        <label class="visually-hidden" for="resource-query">{textConfig.common.searchLabel}</label>
         <input
           id="resource-query"
           type="search"
           name="q"
-          placeholder="搜索资源名称或说明…"
+          placeholder={textConfig.common.searchPlaceholder}
           autocomplete="off"
         />
         <button type="submit">
@@ -33,29 +34,19 @@ const featuredListings = siteConfig.featuredIds.map((id) => {
             <circle cx="10.8" cy="10.8" r="6.3" />
             <path d="m15.5 15.5 4.2 4.2" />
           </svg>
-          <span>搜索</span>
+          <span>{textConfig.common.searchButton}</span>
         </button>
       </form>
-      <p class="search-hint">输入名称或说明中的关键词，前往资源目录查看匹配结果。</p>
+      <p class="search-hint">{textConfig.home.searchHint}</p>
     </section>
-
-    {siteConfig.showHistoricalNotice && (
-      <aside class="history-note" aria-label="关于收录内容">
-        <span class="note-mark" aria-hidden="true">i</span>
-        <div>
-          <h2>历史快照</h2>
-          <p>以下条目沿用上游页面原有收录与说明，未经独立复核。外链、内容和商品信息可能已经变化，请不要将其视为当前状态或医疗建议。</p>
-        </div>
-      </aside>
-    )}
 
     <section class="featured-section" aria-labelledby="featured-title">
       <div class="section-heading">
         <div>
-          <p class="eyebrow">精选收录</p>
-          <h2 id="featured-title">从这里开始了解</h2>
+          <p class="eyebrow">{textConfig.home.featuredEyebrow}</p>
+          <h2 id="featured-title">{textConfig.home.featuredTitle}</h2>
         </div>
-        <a class="all-resources-link" href="/resources/">浏览全部资源 <span aria-hidden="true">→</span></a>
+        <a class="all-resources-link" href="/resources/">{textConfig.home.viewAll} <span aria-hidden="true">→</span></a>
       </div>
 
       <div class="resource-grid">
