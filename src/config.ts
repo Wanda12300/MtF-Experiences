@@ -8,8 +8,19 @@ export const siteConfig = {
   lang: 'zh-CN',
   description: '收录跨性别相关资源，供读者进一步了解。',
   themeColor: {
-    hue: 348, // 0–360; visitors can change it unless fixed is true.
+    hue: 348, // 0-360; visitors can change it unless fixed is true.
     fixed: true,
+  },
+  background: {
+    enable: true,
+    // 随机图片 API（返回 webp），每次刷新附加随机参数绕过 CDN 缓存。
+    src: 'https://t.alcy.cc/ycy',
+    // 背景图层默认透明度，可在页面右上角设置面板中调整（0-0.9）。
+    opacity: 0.35,
+    // 内容卡片（栏目）默认玻璃态不透明度，0-1（越接近 1 越不透明）。
+    cardOpacity: 0.85,
+    // 内容卡片（栏目）默认玻璃态模糊度（px），可在面板中调整。
+    glassBlur: 14,
   },
   banner: {
     enable: false,
@@ -32,6 +43,11 @@ export const textConfig = {
     searchLabel: '搜索资源名称或说明',
     searchPlaceholder: '搜索资源名称或说明…',
     searchButton: '搜索',
+    openSettings: '外观设置',
+    settingsPanel: '外观设置面板',
+    bgOpacity: '背景图片透明度',
+    cardOpacity: '栏目不透明度',
+    glassBlur: '栏目模糊度',
   },
   directory: {
     filterLabel: '资源目录筛选',

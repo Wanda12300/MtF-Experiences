@@ -13,6 +13,7 @@ const pageTitle = title
   ? (title.includes(siteConfig.title) ? title : `${title} | ${siteConfig.title}`)
   : `${siteConfig.title} | ${siteConfig.subtitle}`;
 const showBanner = siteConfig.banner.enable && siteConfig.banner.src;
+const showBgImage = siteConfig.background.enable && siteConfig.background.src;
 ---
 
 <!doctype html>
@@ -42,6 +43,53 @@ const showBanner = siteConfig.banner.enable && siteConfig.banner.src;
   </head>
   <body>
     <a class="skip-link" href="#main-content">{textConfig.common.skipToContent}</a>
+    {showBgImage && (
+      <div class="site-bg" aria-hidden="true">
+        <div class="site-bg__image"></div>
+        <div class="site-bg__scrim"></div>
+      </div>
+    )}
+
+    <button class="settings-fab" type="button" id="settings-fab" aria-expanded="false" aria-controls="settings-panel"
+      title={textConfig.common.openSettings}>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <circle cx="12" cy="12" r="3"></circle>
+        <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09a1.65 1.65 0 0 0 1.51-1 1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33h0a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51h0a1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82v0a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+      </svg>
+      <span class="visually-hidden">{textConfig.common.openSettings}</span>
+    </button>
+
+    <div class="settings-panel" id="settings-panel" data-open="false" role="region" aria-label={textConfig.common.settingsPanel}>
+      {showBgImage && (
+        <div class="settings-row">
+          <header>
+            <label for="bg-opacity">{textConfig.common.bgOpacity}</label>
+            <output id="bg-opacity-out">35%</output>
+          </header>
+          <input id="bg-opacity" type="range" min="0" max="100" value="35" aria-label={textConfig.common.bgOpacity} />
+        </div>
+      )}
+      <div class="settings-row">
+        <header>
+          <label for="card-opacity">{textConfig.common.cardOpacity}</label>
+          <output id="card-opacity-out">85%</output>
+        </header>
+        <input id="card-opacity" type="range" min="20" max="100" value="85" aria-label={textConfig.common.cardOpacity} />
+      </div>
+      <div class="settings-row">
+        <header>
+          <label for="glass-blur">{textConfig.common.glassBlur}</label>
+          <output id="glass-blur-out">14px</output>
+        </header>
+        <input id="glass-blur" type="range" min="0" max="40" value="14" aria-label={textConfig.common.glassBlur} />
+      </div>
+      <div class="settings-sep"></div>
+      <button class="settings-theme-toggle" type="button" id="theme-toggle">
+        <span>{textConfig.common.toggleTheme}</span>
+        <span class="moon" aria-hidden="true">◐</span>
+      </button>
+    </div>
+
     <div class="site-frame">
       <header class="site-header">
         <a class="brand" href="/" aria-label={`${siteConfig.title} ${textConfig.common.home}`}>
@@ -59,9 +107,6 @@ const showBanner = siteConfig.banner.enable && siteConfig.banner.src;
               <input id="theme-hue" type="range" min="0" max="360" value={siteConfig.themeColor.hue} aria-label={textConfig.common.themeColor} />
             </label>
           )}
-          <button class="theme-toggle" type="button" id="theme-toggle" aria-label={textConfig.common.toggleTheme} title={textConfig.common.toggleTheme}>
-            <span aria-hidden="true">◐</span>
-          </button>
         </nav>
       </header>
 
@@ -112,6 +157,120 @@ const showBanner = siteConfig.banner.enable && siteConfig.banner.src;
           // Keep the selected theme for this page view when storage is unavailable.
         }
       });
+
+      // 右上角设置面板
+      const fab = document.querySelector('#settings-fab');
+      const panel = document.querySelector('#settings-panel');
+      fab?.addEventListener('click', () => {
+        const open = panel.dataset.open === 'true';
+        panel.dataset.open = String(!open);
+        fab.setAttribute('aria-expanded', String(!open));
+        if (!open) {
+          panel.querySelector('input[type="range"]')?.focus();
+        }
+      });
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && panel.dataset.open === 'true') {
+          panel.dataset.open = 'false';
+          fab.setAttribute('aria-expanded', 'false');
+          fab.focus();
+        }
+      });
     </script>
+
+    {showBgImage && (
+      <script data-bg-src={siteConfig.background.src} data-bg-opacity={siteConfig.background.opacity} data-card-opacity={siteConfig.background.cardOpacity} data-glass-blur={siteConfig.background.glassBlur} is:inline>
+        (function () {
+          var script = document.currentScript;
+          var src = script && script.dataset.bgSrc;
+          var bgOpacity = script ? Number(script.dataset.bgOpacity || 0.35) : 0.35;
+          var cardOpacity = script ? Number(script.dataset.cardOpacity || 0.85) : 0.85;
+          var layer = document.querySelector('.site-bg__image');
+          if (!src || !layer) return;
+
+          // 让背景图层可见：opacity 直接加在图层上，不依赖 CSS 动画事件，
+          // 避免 prefers-reduced-motion 下动画被禁用后 opacity 永远为 0。
+          function show(img) {
+            layer.replaceChildren(img);
+            requestAnimationFrame(function () {
+              layer.style.opacity = String(bgOpacity);
+              img.style.opacity = '1';
+            });
+          }
+
+          // 每次加载都附加随机参数，保证刷新时取到不同的图
+          var sep = src.indexOf('?') === -1 ? '?' : '&';
+          var url = src + sep + 'r=' + Math.random().toString(36).slice(2, 10) + '&t=' + Date.now();
+
+          var img = new Image();
+          img.decoding = 'async';
+          img.alt = '';
+          img.className = 'site-bg__image__pic';
+          img.referrerPolicy = 'no-referrer';
+          img.style.opacity = '0';
+          img.onload = function () { show(img); };
+          img.onerror = function () {
+            // API 暂不可用时退到不带参数的地址再试一次
+            var fb = new Image();
+            fb.decoding = 'async';
+            fb.alt = '';
+            fb.className = 'site-bg__image__pic';
+            fb.style.opacity = '0';
+            fb.referrerPolicy = 'no-referrer';
+            fb.onload = function () { show(fb); };
+            fb.src = src;
+          };
+          img.src = url;
+          layer.appendChild(img);
+
+          // 设置面板控制条：背景透明度 + 栏目不透明度
+          var rootStyle = document.documentElement.style;
+          var bgSlider = document.querySelector('#bg-opacity');
+          var cardSlider = document.querySelector('#card-opacity');
+          var blurSlider = document.querySelector('#glass-blur');
+          var bgOut = document.querySelector('#bg-opacity-out');
+          var cardOut = document.querySelector('#card-opacity-out');
+          var blurOut = document.querySelector('#glass-blur-out');
+
+          function applyCardAlpha(v) {
+            rootStyle.setProperty('--card-alpha', String(v));
+            try { localStorage.setItem('card-alpha', String(v)); } catch (e) { /* noop */ }
+            if (cardOut) cardOut.textContent = Math.round(v * 100) + '%';
+          }
+          function applyBgOpacity(v) {
+            bgOpacity = v;
+            layer.style.opacity = String(v);
+            if (bgOut) bgOut.textContent = Math.round(v * 100) + '%';
+          }
+          function applyBlur(px) {
+            rootStyle.setProperty('--glass-blur', px + 'px');
+            try { localStorage.setItem('glass-blur', String(px)); } catch (e) { /* noop */ }
+            if (blurOut) blurOut.textContent = px + 'px';
+          }
+
+          // 恢复上次保存的值
+          var savedCard;
+          try { savedCard = Number(localStorage.getItem('card-alpha')); } catch (e) { savedCard = NaN; }
+          var useCard = Number.isFinite(savedCard) && savedCard >= 0.2 && savedCard <= 1 ? savedCard : cardOpacity;
+          if (cardSlider) {
+            cardSlider.value = String(Math.round(useCard * 100));
+            applyCardAlpha(useCard);
+            cardSlider.addEventListener('input', function () { applyCardAlpha(Number(cardSlider.value) / 100); });
+          }
+          if (bgSlider) {
+            bgSlider.value = String(Math.round(bgOpacity * 100));
+            bgSlider.addEventListener('input', function () { applyBgOpacity(Number(bgSlider.value) / 100); });
+          }
+          var savedBlur;
+          try { savedBlur = Number(localStorage.getItem('glass-blur')); } catch (e) { savedBlur = NaN; }
+          var useBlur = Number.isFinite(savedBlur) && savedBlur >= 0 && savedBlur <= 40 ? savedBlur : (Number(script.dataset.glassBlur || 14));
+          if (blurSlider) {
+            blurSlider.value = String(useBlur);
+            applyBlur(useBlur);
+            blurSlider.addEventListener('input', function () { applyBlur(Number(blurSlider.value)); });
+          }
+        })();
+      </script>
+    )}
   </body>
 </html>
