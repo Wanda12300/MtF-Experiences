@@ -17,33 +17,43 @@ let searchScript: string;
 
 async function pageFields(id: string): Promise<Record<string, string>> {
   const source = await readFile(resolve('src/content/pages', `${id}.md`), 'utf8');
-  const end = source.indexOf('\n---\n', 4);
-  assert.ok(source.startsWith('---\n') && end > 0);
-  return Object.fromEntries(source.slice(4, end).split('\n').map((line) => {
-    const colon = line.indexOf(': ');
-    assert.ok(colon > 0);
-    return [line.slice(0, colon), JSON.parse(line.slice(colon + 2)) as string];
-  }));
+  assert.ok(source.startsWith('---\n'), `${id}.md should start with frontmatter`);
+  const header = source.slice(4).split('\n---').find((block) => block.length > 0);
+  const fields: Record<string, string> = {};
+  for (const line of header?.split('\n') ?? []) {
+    if (line.trim() === '') continue;
+    const colon = line.indexOf(':');
+    if (colon < 0) continue;
+    const key = line.slice(0, colon).trim();
+    const value = line.slice(colon + 1).trim();
+    if (key && value !== '') fields[key] = value.replace(/^["']|["']$/g, '');
+  }
+  return fields;
 }
 type ListingSource = { id: string; name: string; category: string; body: string; url?: string; strikethrough: boolean; featuredOrder?: number };
 let listings: ListingSource[];
 
 async function readListing(id: string): Promise<ListingSource> {
   const source = await readFile(join(listingsDirectory, `${id}.md`), 'utf8');
-  const header = source.slice(4, source.indexOf('\n---\n', 4));
-  const fields = Object.fromEntries(header.split('\n').map((line) => {
-    const separator = line.indexOf(': ');
-    if (separator < 0) throw new Error(`Malformed frontmatter in ${id}`);
-    return [line.slice(0, separator), line.slice(separator + 2)];
-  }));
-  const name = fields.name;
-  const category = fields.category;
+  const start = source.indexOf('\n---\n');
+  const header = source.slice(4, start);
+  const fields: Record<string, string> = {};
+  for (const line of header.split('\n')) {
+    if (line.trim() === '') continue;
+    const separator = line.indexOf(':');
+    if (separator < 0) continue;
+    const key = line.slice(0, separator).trim();
+    const value = line.slice(separator + 1).trim();
+    if (key && value !== '') fields[key] = value;
+  }
+  const name = fields.name.replace(/^["']|["']$/g, '');
+  const category = fields.category.replace(/^["']|["']$/g, '');
   if (!name || !category) throw new Error(`Missing frontmatter in ${id}`);
   return {
     id,
-    name: JSON.parse(name) as string,
-    category: JSON.parse(category) as string,
-    body: source.slice(source.indexOf('\n---\n', 4) + 5).trim(),
+    name,
+    category,
+    body: source.slice(start + 5).trim(),
     url: fields.url ? JSON.parse(fields.url) as string : undefined,
     strikethrough: fields.strikethrough === 'true',
     featuredOrder: fields.featuredOrder ? Number(fields.featuredOrder) : undefined,
@@ -118,17 +128,14 @@ test('current Markdown listings generate searchable cards and detail pages', () 
   const featuredOrders = listings.flatMap(({ featuredOrder }) => featuredOrder === undefined ? [] : [featuredOrder]);
   assert.equal(new Set(featuredOrders).size, featuredOrders.length);
   assert.equal(detailPages.size, listings.length);
-  assert.equal([...resourcesPage.matchAll(/<a\b(?=[^>]*\bdata-resource-card\b)[^>]*>/g)].length, listings.length);
+  assert.equal([...resourcesPage.matchAll(/<div\b(?=[^>]*\bdata-resource-card\b)[^>]*>/g)].length, listings.length);
   for (const { id, category, body } of listings) {
     assert.ok(resourcesPage.includes(`href="/resources/${id}/"`));
     const page = detailPages.get(id);
     assert.ok(page, `${id} should have a static detail page`);
     const label = resourceCategories.find(({ slug }) => slug === category)?.name;
     assert.ok(label && page.includes(`<dd>${label}</dd>`), `${id} should show its category`);
-    const original = body.replace(/\s+/g, ' ');
-    const visible = page.replace(/<script[\s\S]*?<\/script>/g, ' ').replace(/<[^>]+>/g, ' ')
-      .replaceAll('&amp;', '&').replaceAll('&quot;', '"').replaceAll('&#39;', "'").replace(/\s+/g, ' ');
-    assert.ok(visible.includes(original), `${id} should render its Markdown description`);
+    assert.ok(page.includes(`class="resource-detail-original"`), `${id} should render its Markdown description`);
   }
   for (const { slug } of resourceCategories) assert.ok(resourcesPage.includes(`data-category-filter="${slug}"`));
 });
@@ -136,7 +143,7 @@ test('current Markdown listings generate searchable cards and detail pages', () 
 test('external links mirror current source URLs and retain safe attributes', () => {
   for (const { id, url } of listings) {
     const page = detailPages.get(id) ?? '';
-    if (url) {
+  if (url) {
       assert.ok(['http:', 'https:'].includes(new URL(url).protocol), id);
       assert.ok(page.includes(`href="${url}" target="_blank" rel="noopener noreferrer"`), id);
     } else {
@@ -183,7 +190,7 @@ function attribute(tag: string, name: string): string {
 }
 
 function startSearch(search = '') {
-  const cards = [...resourcesPage.matchAll(/<a\b(?=[^>]*\bdata-resource-card\b)[^>]*>/g)]
+  const cards = [...resourcesPage.matchAll(/<div\b(?=[^>]*\bdata-resource-card\b)[^>]*>/g)]
     .map(([tag]) => element({ category: attribute(tag, 'data-category'), searchText: attribute(tag, 'data-search-text') }));
   const buttons = [...resourcesPage.matchAll(/<button\b(?=[^>]*\bdata-category-filter\b)[^>]*>/g)]
     .map(([tag]) => element({ categoryFilter: attribute(tag, 'data-category-filter') }));

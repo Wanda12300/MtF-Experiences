@@ -1,6 +1,7 @@
 ---
 import type { CollectionEntry } from 'astro:content';
 import { textConfig } from '../config';
+import { render } from 'astro:content';
 
 interface Props {
   entry: CollectionEntry<'listings'>;
@@ -8,7 +9,7 @@ interface Props {
 }
 
 const { entry, categoryName } = Astro.props;
-const description = entry.body?.trim() ?? '';
+const { Content } = await render(entry);
 const externalUrl = entry.data.url;
 const externalHost = externalUrl ? new URL(externalUrl).host : undefined;
 ---
@@ -28,7 +29,7 @@ const externalHost = externalUrl ? new URL(externalUrl).host : undefined;
       <section class="resource-detail-description" aria-labelledby="resource-description-title">
         <h2 id="resource-description-title">{textConfig.detail.description}</h2>
         <div class:list={["resource-detail-original", { "resource-detail-original-struck": entry.data.strikethrough }]}>
-          {entry.data.strikethrough ? <del><p>{description}</p></del> : <p>{description}</p>}
+          {entry.data.strikethrough ? <del><Content /></del> : <Content />}
         </div>
       </section>
     </article>

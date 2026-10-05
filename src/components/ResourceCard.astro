@@ -1,6 +1,7 @@
 ---
 import type { CollectionEntry } from 'astro:content';
 import { textConfig } from '../config';
+import { render } from 'astro:content';
 
 interface Props {
   entry: CollectionEntry<'listings'>;
@@ -9,22 +10,24 @@ interface Props {
 }
 
 const { entry, categoryLabel, searchable = false } = Astro.props;
+const { Content } = await render(entry);
 const description = entry.body?.trim() ?? '';
 ---
 
-<a
+<div
   class="resource-card"
-  href={`/resources/${entry.id}/`}
-  aria-label={textConfig.card.label(entry.data.name, entry.data.strikethrough)}
   data-resource-card={searchable ? '' : undefined}
   data-category={searchable ? entry.data.category : undefined}
   data-search-text={searchable ? `${entry.data.name} ${description}` : undefined}
 >
   {categoryLabel && <span class="resource-card-category">{categoryLabel}</span>}
   <div class="resource-card-heading">
-    <h3>{entry.data.strikethrough ? <del>{entry.data.name}</del> : entry.data.name}</h3>
-    <span class="resource-card-arrow" aria-hidden="true">→</span>
+    <a class="resource-card-title" href={`/resources/${entry.id}/`}
+      aria-label={textConfig.card.label(entry.data.name, entry.data.strikethrough)}>
+      <h3>{entry.data.strikethrough ? <del>{entry.data.name}</del> : entry.data.name}</h3>
+      <span class="resource-card-arrow" aria-hidden="true">→</span>
+    </a>
   </div>
-  <p>{description}</p>
-  <span class="resource-card-action">{textConfig.card.open}</span>
-</a>
+  <div class="resource-card-description">{entry.data.strikethrough ? <del><Content /></del> : <Content />}</div>
+  <a class="resource-card-action" href={`/resources/${entry.id}/`}>{textConfig.card.open}</a>
+</div>
