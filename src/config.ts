@@ -4,7 +4,7 @@ export type ProfileLink = { name: string; url: string; icon?: string };
 
 export const siteConfig = {
   title: 'MtF Experiences',
-  subtitle: '跨性别资源目录',
+  subtitle: '柔情猫娘の跨性别资源目录',
   lang: 'zh-CN',
   description: '收录跨性别相关资源，供读者进一步了解。',
   themeColor: {
