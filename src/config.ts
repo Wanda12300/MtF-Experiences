@@ -6,7 +6,7 @@ export const siteConfig = {
   title: 'MtF Experiences',
   subtitle: '跨性别资源目录',
   lang: 'zh-CN',
-  description: '收录跨性别相关资源，供读者进一步了解。',
+  description: '收录跨性别相关资源，供读者进一步了解，内容仅供参考，不构成医疗建议。',
   themeColor: {
     hue: 348, // 0-360; visitors can change it unless fixed is true.
     fixed: true,
@@ -51,10 +51,11 @@ export const aboutAnnouncementConfig = {
   enable: true,
   title: '讣告',
   lines: [
-    '开发者Delusions6515已经在2026年10月24日发布遗书后失联（大概率已经去世）',
-    '晚安，愿你在那边可以变成真正的女孩子...'
-  ] as string[],
+    '开发者Delusions6515已经在2026年10月24日发布遗书后失联（大概率已经去世）。',
+    '晚安，愿你在那边可以变成真正的女孩子...',
+  ],
   confirmText: 'R.I.P...',
+  oncePerDay: true,
 };
 
 // Shared interface copy; resource-specific fields live with each Markdown listing.

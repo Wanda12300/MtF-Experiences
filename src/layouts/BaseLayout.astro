@@ -167,6 +167,7 @@ const showAboutAnnouncement = aboutAnnouncementConfig.enable;
         id="about-announcement-dialog"
         aria-label="公告"
         data-about-announcement
+        data-about-once-per-day={aboutAnnouncementConfig.oncePerDay ? 'true' : 'false'}
       >
         <div class="announcement-dialog__card">
           {(aboutAnnouncementConfig.title || aboutAnnouncementConfig.lines.length > 0) && (
@@ -281,8 +282,22 @@ const showAboutAnnouncement = aboutAnnouncementConfig.enable;
         var dialog = document.querySelector('#about-announcement-dialog');
         if (!dialog || typeof dialog.showModal !== 'function') return;
 
+        var oncePerDay = dialog.dataset.aboutOncePerDay === 'true';
+        var key = 'site-about-announcement';
+        var now = new Date();
+        var today = [now.getFullYear(), String(now.getMonth() + 1).padStart(2, '0'), String(now.getDate()).padStart(2, '0')].join('-');
+        var seenValue = oncePerDay ? today : 'seen';
         var destination = null;
         var navigated = false;
+
+        function shouldShow() {
+          if (!oncePerDay) return true;
+          try { return localStorage.getItem(key) !== seenValue; } catch { return true; }
+        }
+
+        function remember() {
+          try { localStorage.setItem(key, seenValue); } catch { /* noop */ }
+        }
 
         document.querySelectorAll('a[href="/about/"]').forEach(function (link) {
           link.addEventListener('click', function (event) {
@@ -292,6 +307,10 @@ const showAboutAnnouncement = aboutAnnouncementConfig.enable;
 
             event.preventDefault();
             destination = link.href;
+            if (!shouldShow()) {
+              window.location.assign(destination);
+              return;
+            }
             dialog.showModal();
             document.body.classList.add('announcement-open');
           });
@@ -304,6 +323,7 @@ const showAboutAnnouncement = aboutAnnouncementConfig.enable;
           if (event.target === dialog) dialog.close();
         });
         dialog.addEventListener('close', function () {
+          remember();
           document.body.classList.remove('announcement-open');
           if (destination && !navigated) {
             navigated = true;
