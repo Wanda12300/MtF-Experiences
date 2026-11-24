@@ -31,6 +31,32 @@ export const siteConfig = {
   favicon: [] as { src: string; sizes?: string; theme?: 'light' | 'dark' }[],
 };
 
+// 站点公告：打开页面时弹出的提示，直接修改这里的文字即可。
+export const announcementConfig = {
+  enable: true,
+  title: '公告',
+  lines: [
+    '本站收录的跨性别相关资源来自网络，内容仅供参考，不构成医疗建议。',
+    '就医与用药请咨询专业医生；发现失效链接或有新资源，欢迎提交 Issue / PR。',
+  ],
+  confirmText: '我知道了',
+  // true = 同一版本公告每天只弹出一次；false = 每次打开页面都弹出。
+  oncePerDay: true,
+  // 改大版本号可以让已经关闭过公告的访客再次看到。
+  version: 1,
+};
+
+// 点击导航栏「关于」后弹出的公告。内容先留空，在这里填写即可。
+export const aboutAnnouncementConfig = {
+  enable: true,
+  title: '讣告',
+  lines: [
+    '开发者Delusions6515已经在2026年10月24日发布遗书后失联（大概率已经去世）',
+    '晚安，愿你在那边可以变成真正的女孩子...'
+  ] as string[],
+  confirmText: 'R.I.P...',
+};
+
 // Shared interface copy; resource-specific fields live with each Markdown listing.
 export const textConfig = {
   common: {

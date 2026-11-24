@@ -1,7 +1,7 @@
 ---
 import '../styles/app.css';
 import 'sakana-widget/lib/index.css';
-import { licenseConfig, navBarConfig, profileConfig, siteConfig, textConfig } from '../config';
+import { aboutAnnouncementConfig, announcementConfig, licenseConfig, navBarConfig, profileConfig, siteConfig, textConfig } from '../config';
 
 interface Props {
   title?: string;
@@ -14,6 +14,9 @@ const pageTitle = title
   : `${siteConfig.title} | ${siteConfig.subtitle}`;
 const showBanner = siteConfig.banner.enable && siteConfig.banner.src;
 const showBgImage = siteConfig.background.enable && siteConfig.background.src;
+const showAnnouncement = announcementConfig.enable && Boolean(announcementConfig.title || announcementConfig.lines.length);
+const announcementKey = `site-announcement:v${announcementConfig.version}`;
+const showAboutAnnouncement = aboutAnnouncementConfig.enable;
 ---
 
 <!doctype html>
@@ -131,6 +134,64 @@ const showBgImage = siteConfig.background.enable && siteConfig.background.src;
       </footer>
     </div>
 
+    {showAnnouncement && (
+      <dialog
+        class="announcement-dialog"
+        id="announcement-dialog"
+        aria-labelledby="announcement-title"
+        aria-describedby="announcement-message"
+        data-announcement-key={announcementKey}
+        data-once-per-day={announcementConfig.oncePerDay ? 'true' : 'false'}
+      >
+        <div class="announcement-dialog__card">
+          <div class="announcement-dialog__header">
+            <span class="announcement-dialog__icon" aria-hidden="true">!</span>
+            <div>
+              <p class="eyebrow">Notice</p>
+              <h2 id="announcement-title">{announcementConfig.title}</h2>
+            </div>
+          </div>
+          <div class="announcement-dialog__message" id="announcement-message">
+            {announcementConfig.lines.map((line) => <p>{line}</p>)}
+          </div>
+          <button class="announcement-dialog__button" type="button" data-announcement-close autofocus>
+            {announcementConfig.confirmText}
+          </button>
+        </div>
+      </dialog>
+    )}
+
+    {showAboutAnnouncement && (
+      <dialog
+        class="announcement-dialog"
+        id="about-announcement-dialog"
+        aria-label="公告"
+        data-about-announcement
+      >
+        <div class="announcement-dialog__card">
+          {(aboutAnnouncementConfig.title || aboutAnnouncementConfig.lines.length > 0) && (
+            <div class="announcement-dialog__header">
+              <span class="announcement-dialog__icon" aria-hidden="true">!</span>
+              {aboutAnnouncementConfig.title && (
+                <div>
+                  <p class="eyebrow">Notice</p>
+                  <h2 id="about-announcement-title">{aboutAnnouncementConfig.title}</h2>
+                </div>
+              )}
+            </div>
+          )}
+          {aboutAnnouncementConfig.lines.length > 0 && (
+            <div class="announcement-dialog__message" id="about-announcement-message">
+              {aboutAnnouncementConfig.lines.map((line) => <p>{line}</p>)}
+            </div>
+          )}
+          <button class="announcement-dialog__button" type="button" data-about-announcement-close autofocus>
+            {aboutAnnouncementConfig.confirmText}
+          </button>
+        </div>
+      </dialog>
+    )}
+
     <div id="sakana-widget" aria-label="Sakana 互动小组件"></div>
     <script>
       import SakanaWidget from 'sakana-widget';
@@ -176,6 +237,80 @@ const showBgImage = siteConfig.background.enable && siteConfig.background.src;
           fab.focus();
         }
       });
+    </script>
+
+    <script is:inline>
+      (function () {
+        var dialog = document.querySelector('#announcement-dialog');
+        if (!dialog || typeof dialog.showModal !== 'function') return;
+
+        var key = dialog.dataset.announcementKey || 'site-announcement:v1';
+        var oncePerDay = dialog.dataset.oncePerDay === 'true';
+        var now = new Date();
+        var today = [now.getFullYear(), String(now.getMonth() + 1).padStart(2, '0'), String(now.getDate()).padStart(2, '0')].join('-');
+        var seenValue = oncePerDay ? today : 'seen';
+
+        try {
+          if (localStorage.getItem(key) === seenValue) return;
+        } catch {
+          // Storage may be unavailable; the announcement still works for this view.
+        }
+
+        function remember() {
+          try { localStorage.setItem(key, seenValue); } catch { /* noop */ }
+        }
+
+        dialog.addEventListener('close', function () {
+          remember();
+          document.body.classList.remove('announcement-open');
+        });
+        dialog.querySelector('[data-announcement-close]')?.addEventListener('click', function () {
+          dialog.close();
+        });
+        dialog.addEventListener('click', function (event) {
+          if (event.target === dialog) dialog.close();
+        });
+
+        dialog.showModal();
+        document.body.classList.add('announcement-open');
+      })();
+    </script>
+
+    <script is:inline>
+      (function () {
+        var dialog = document.querySelector('#about-announcement-dialog');
+        if (!dialog || typeof dialog.showModal !== 'function') return;
+
+        var destination = null;
+        var navigated = false;
+
+        document.querySelectorAll('a[href="/about/"]').forEach(function (link) {
+          link.addEventListener('click', function (event) {
+            if (event.defaultPrevented || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+            if (link.target && link.target !== '_self') return;
+            if (link.hasAttribute('download')) return;
+
+            event.preventDefault();
+            destination = link.href;
+            dialog.showModal();
+            document.body.classList.add('announcement-open');
+          });
+        });
+
+        dialog.querySelector('[data-about-announcement-close]')?.addEventListener('click', function () {
+          dialog.close();
+        });
+        dialog.addEventListener('click', function (event) {
+          if (event.target === dialog) dialog.close();
+        });
+        dialog.addEventListener('close', function () {
+          document.body.classList.remove('announcement-open');
+          if (destination && !navigated) {
+            navigated = true;
+            window.location.assign(destination);
+          }
+        });
+      })();
     </script>
 
     {showBgImage && (
